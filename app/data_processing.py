@@ -11,8 +11,8 @@ def upload_file() -> Union[object, None]:
         st.UploadedFile or None: The uploaded file object if a file is uploaded,
         otherwise None.
     """
-    st.sidebar.title('Upload Trial')
-    uploaded_file = st.sidebar.file_uploader("Upload a clinical trial document", type=["pdf", "docx", "txt"])
+    st.sidebar.title('Upload Trial Document')
+    uploaded_file = st.sidebar.file_uploader("", type=["pdf", "docx", "txt"])
     return uploaded_file
 
 def extract_text(file) -> Union[str, None]:

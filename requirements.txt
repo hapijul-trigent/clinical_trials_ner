@@ -1,0 +1,6 @@
+streamlit
+sparknlp
+PyPDF2
+python-docx
+pandas
+pytest

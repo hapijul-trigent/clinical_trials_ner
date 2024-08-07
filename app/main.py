@@ -16,7 +16,7 @@ st.set_page_config(
     }
 )
 
-#
+# Application
 st.image('static/images/Trigent_Logo_full.png')
 st.title("Clinical Trials NER Application")
 uploaded_file = upload_file()

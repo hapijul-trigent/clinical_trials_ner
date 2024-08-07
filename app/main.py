@@ -6,7 +6,7 @@ from data_processing import upload_file, extract_text
 st.set_page_config(
     page_title="Clinical Trials NER Application",
     page_icon="🩺",
-    layout="wide",
+    layout="centered",
     initial_sidebar_state="expanded",
     menu_items={
         'Get Help': 'https://www.extremelycoolapp.com/help',

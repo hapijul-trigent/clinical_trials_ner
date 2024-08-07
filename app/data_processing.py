@@ -1,9 +1,9 @@
 import streamlit as st
 import PyPDF2
 from docx import Document
-from typing import Union
+from typing import Union, Tuple
 
-def upload_file() -> Union[object, None]:
+def upload_file() -> Tuple:
     """
     File uploader widget for clinical trial documents.
 

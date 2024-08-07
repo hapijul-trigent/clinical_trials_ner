@@ -22,4 +22,10 @@ st.title("Clinical Trials NER Application")
 uploaded_file = upload_file()
 if uploaded_file:
     text = extract_text(uploaded_file)
+    if text.strip():
+        # Your text area widget
+        st.text_area(label='Editor', value=text, height=int(len(text.strip())/2))
+        generateButton = st.button('Generate', type='primary')
+    else:
+        st.info('Empty File!')
  

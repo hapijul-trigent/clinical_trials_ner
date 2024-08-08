@@ -1,20 +1,13 @@
 import logging
-import json
-import os
-from pyspark.ml import Pipeline,PipelineModel
-from pyspark.sql import SparkSession
-from sparknlp_display import NerVisualizer
-from sparknlp_display import EntityResolverVisualizer
-
-from sparknlp.annotator import *
-from sparknlp_jsl.annotator import *
-from sparknlp.base import *
-import sparknlp_jsl
-import sparknlp
-
-import pyspark.sql.functions as F
-import pyspark.sql.types as T
-
+from pyspark.ml import Pipeline
+from sparknlp.annotator import (
+    DocumentAssembler, 
+    SentenceDetectorDLModel, 
+    Tokenizer, 
+    WordEmbeddingsModel, 
+    MedicalNerModel, 
+    NerConverter
+)
 import streamlit as st
 
 # Configure logging

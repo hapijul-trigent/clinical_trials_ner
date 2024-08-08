@@ -19,7 +19,7 @@ st.set_page_config(
 
 # Application
 # SideBar
-st.sidebar.image("static/images/Trigent_Logo.png")
+# st.sidebar.image("static/images/Trigent_Logo.png")
 st.sidebar.title('Trigent Clinical NER')
 selected_model, selected_entities = model_and_entity_selection(location=st.sidebar)
 uploaded_file = upload_file(location=st.sidebar)
@@ -32,7 +32,7 @@ if uploaded_file:
     if text.strip():
         # Your text area widget
         st.text_area(label='Editor', value=text, height=200)
-        generateButton = st.button('Generate', type='primary')
+        generateButton = st.button('Extract Entities', type='primary')
     else:
         st.info('Empty File!')
  

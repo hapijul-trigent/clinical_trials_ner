@@ -4,8 +4,8 @@ from johnsnowlabs import nlp
 nlp.start()
 medical_text = ''' The patient is a 5-month-old infant who presented initially on Monday with
 a cold, cough, and runny nose for 2 days'''
-resp = nlp.load('med_ner.jsl.wip.clinical').predict(medical_text)
-print(resp)
+# resp = nlp.load('med_ner.jsl.wip.clinical').predict(medical_text)
+# print(resp)
 
 # def load_ner_model():
 #     """

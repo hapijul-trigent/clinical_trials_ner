@@ -29,7 +29,7 @@ pd.set_option('display.max_colwidth', 200)
 import warnings
 warnings.filterwarnings('ignore')
 
-params = {"spark.driver.memory":"10G", 
+params = {"spark.driver.memory":"4G", 
           "spark.kryoserializer.buffer.max":"2000M", 
           "spark.driver.maxResultSize":"2000M"} 
 

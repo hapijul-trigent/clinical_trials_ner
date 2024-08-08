@@ -12,3 +12,58 @@ Streamlit application that utilizes John Snow Labs NLP models to perform Named E
 # Installing Spark NLP Display Library for visualization
 ! pip install -q spark-nlp-display
 ```
+
+To install Java 8 on Ubuntu, you can use the following steps:
+
+1. **Update the package index:**
+   ```bash
+   sudo apt update
+   ```
+
+2. **Install Java 8:**
+   ```bash
+   sudo apt install openjdk-8-jdk
+   ```
+
+3. **Verify the installation:**
+   ```bash
+   java -version
+   ```
+
+   This should output something like:
+   ```
+   openjdk version "1.8.0_xxx"
+   OpenJDK Runtime Environment (build 1.8.0_xxx-xxx)
+   OpenJDK 64-Bit Server VM (build 25.71-b00, mixed mode)
+   ```
+
+4. **Set Java 8 as the default Java version (if you have multiple versions installed):**
+   ```bash
+   sudo update-alternatives --config java
+   ```
+
+   This command will list all installed Java versions. Select the appropriate number for Java 8.
+
+5. **Set the `JAVA_HOME` environment variable (optional but recommended):**
+
+   Open the `/etc/environment` file in an editor:
+   ```bash
+   sudo nano /etc/environment
+   ```
+
+   Add the following line:
+   ```bash
+   JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+   ```
+
+   Save and close the file, then reload it:
+   ```bash
+   source /etc/environment
+   ```
+
+   You can verify it by:
+   ```bash
+   echo $JAVA_HOME
+   ```
+
+These steps will install Java 8 on your Ubuntu system and configure it appropriately.

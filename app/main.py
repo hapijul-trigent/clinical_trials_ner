@@ -21,7 +21,7 @@ st.set_page_config(
 # SideBar
 st.sidebar.image("static/images/Trigent_Logo.png")
 st.sidebar.title('Trigent Clinical NER')
-model_and_entity_selection(location=st.sidebar)
+selected_model, selected_entities = model_and_entity_selection(location=st.sidebar)
 uploaded_file = upload_file(location=st.sidebar)
 
 # Body

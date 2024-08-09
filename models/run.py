@@ -1,5 +1,6 @@
 import os 
 import json
+from pipeline_setup import buildNerPipeline
 
 with open('.secret/spark_nlp_for_healthcare_8568.json') as f:
     license_keys = json.load(f)
@@ -46,54 +47,19 @@ sample_text = """The patient is a 40-year-old white male who presents with a chi
 
 
 # ---------------------------------------------
-jsl_model_list = ["ner_jsl",]
+
+# pipe = buildNerPipeline(selectedModel='ner_jsl', selectedEntities=["Procedure", "Symptom", "Treatments", "Diabetes", "Drug", "Dosage",])
+# pipe
 
 
-documentAssembler = DocumentAssembler()\
-                .setInputCol("text")\
-                .setOutputCol("document")
+# jsl_ner_model = Pipeline.fit(spark.createDataFrame([['']]).toDF("text"))
 
-sentenceDetector = SentenceDetectorDLModel.pretrained("sentence_detector_dl_healthcare","en","clinical/models") \
-                .setInputCols(["document"]) \
-                .setOutputCol("sentence") 
-
-tokenizer = Tokenizer()\
-                .setInputCols(["sentence"])\
-                .setOutputCol("token")
-
-jsl_ner_converter = NerConverterInternal() \
-                .setInputCols(["sentence", "token", "jsl_ner"]) \
-                .setOutputCol("ner_chunk")
-
-embeddings = WordEmbeddingsModel.pretrained("embeddings_clinical", "en", "clinical/models")\
-                .setInputCols(["sentence", "token"])\
-                .setOutputCol("embeddings")
-  
-for model_name in jsl_model_list:
-
-  jsl_ner = MedicalNerModel.pretrained(model_name, "en", "clinical/models") \
-                          .setInputCols(["sentence", "token", "embeddings"]) \
-                          .setOutputCol("jsl_ner")
-
-
-  jsl_ner_pipeline = Pipeline(stages=[documentAssembler, 
-                                      sentenceDetector,
-                                      tokenizer,
-                                      embeddings,
-                                      jsl_ner,
-                                      jsl_ner_converter])
-
-
-  jsl_ner_model = jsl_ner_pipeline.fit(spark.createDataFrame([['']]).toDF("text"))
-  
-  light_model = LightPipeline(jsl_ner_model)
-  light_result = light_model.fullAnnotate(sample_text)
-
-  print("\n\n\n")
-  print(f"***************  The visualization results for {model_name} ***************")
-  print("\n\n\n")
-
-  from sparknlp_display import NerVisualizer
-  visualiser = NerVisualizer()
-  visualiser.display(light_result[0], label_col='ner_chunk', document_col='document')
-  print("\n\n\n")
+# light_model = LightPipeline(jsl_ner_model)
+# light_result = light_model.fullAnnotate(sample_text)
+# print("\n\n\n")
+# print(f"***************  The visualization results for {model_name} ***************")
+# print("\n\n\n")
+# from sparknlp_display import NerVisualizer
+# visualiser = NerVisualizer()
+# visualiser.display(light_result[0], label_col='ner_chunk', document_col='document')
+# print("\n\n\n")

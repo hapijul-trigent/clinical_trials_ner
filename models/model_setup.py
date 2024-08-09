@@ -48,7 +48,7 @@ def setup_config(config_path='.secret/spark_nlp_for_healthcare_8568.json'):
         raise
 
 @st.cache_data
-def get_spark(secret):
+def initSparkSession(secret):
     """
     Initialize and return a Spark NLP session with specified configurations.
 

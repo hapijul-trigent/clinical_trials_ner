@@ -28,7 +28,7 @@ def buildNerPipeline(selectedModel, selectedEntities, spark: SparkSession = spar
     Returns:
         light_model_pipeline: A Spark ML pipeline configured for NER.
     """
-    global logger
+    logger = logging.getLogger(__name__)
     try:
         # Load and set up the NER model
         ner_model = MedicalNerModel.pretrained(selectedModel, "en", "clinical/models")\

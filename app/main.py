@@ -1,3 +1,10 @@
+import logging
+import sys, os
+
+sys.path.append('/workspaces/clinical_trials_ner')
+sys.path.append('/workspaces/clinical_trials_ner/app')
+sys.path.append('/workspaces/clinical_trials_ner/models')
+
 import streamlit as st
 from data_processing import upload_file, extract_text
 from ner import model_and_entity_selection
@@ -6,7 +13,6 @@ from models.pipeline_stages import spark, license_keys
 from models.pipeline_setup import buildNerPipeline
 from visualization import visualize_ner
 from PIL import Image
-import logging
 
 
 # Configure logging
@@ -40,6 +46,7 @@ uploaded_file = upload_file(location=st.sidebar)
 # Body
 st.image('static/images/Trigent_Logo_full.png')
 st.title("Clinical Trials NER Application")
+generateButton = None
 if uploaded_file:
     text = extract_text(uploaded_file)
     if text.strip():
@@ -49,6 +56,7 @@ if uploaded_file:
     else:
         st.info('Empty File!')
 if generateButton and text:
+    logger.info(f'{selected_model}: {selected_entities}')
     light_model_pipeline = buildNerPipeline(selectedModel=selected_model, selectedEntities=selected_entities)
     results = light_model_pipeline.fullAnnotate(text)
 

@@ -13,7 +13,7 @@ def visualize_ner(light_result):
     Returns:
     HTML: HTML to displays the NER visualization in the Streamlit app.
     """
-    global logger
+    logger = logging.getLogger(__name__)
     try:
         visualiser = NerVisualizer()
         html = visualiser.display(light_result[0], label_col='ner_chunk', document_col='document', return_html=True)

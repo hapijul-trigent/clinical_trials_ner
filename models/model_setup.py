@@ -17,7 +17,7 @@ import streamlit as st
 
 
 
-@st.cache_data
+
 def setup_config(config_path='.secret/spark_nlp_for_healthcare_8568.json'):
     """
     Loads Spark NLP for Healthcare license keys from a JSON file and sets them as environment variables.
@@ -32,7 +32,7 @@ def setup_config(config_path='.secret/spark_nlp_for_healthcare_8568.json'):
         FileNotFoundError: If the JSON file is not found.
         json.JSONDecodeError: If the JSON file cannot be decoded.
     """
-    global logger
+    logger = logging.getLogger(__name__)
     try:
         with open(config_path) as f:
             license_keys = json.load(f)
@@ -46,7 +46,7 @@ def setup_config(config_path='.secret/spark_nlp_for_healthcare_8568.json'):
         logger.error("Error: Failed to decode JSON. %s", e)
         raise
 
-@st.cache_resource
+
 def initSparkSession(secret):
     """
     Initialize and return a Spark NLP session with specified configurations.
@@ -69,7 +69,7 @@ def initSparkSession(secret):
         "spark.kryoserializer.buffer.max": "2000M",
         "spark.driver.maxResultSize": "2000M"
     }
-
+    logger = logging.getLogger(__name__)
     try:
         spark = sparknlp_jsl.start(secret, params=params)
         logger.info("Spark NLP Version: %s", sparknlp.version())

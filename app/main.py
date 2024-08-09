@@ -13,6 +13,9 @@ from app.pipeline_stages import spark, license_keys
 from app.pipeline_setup import buildNerPipeline
 from visualization import visualize_ner
 from PIL import Image
+from sparknlp.annotator import *
+from sparknlp_jsl.annotator import *
+from sparknlp.base import *
 
 
 # Configure logging
@@ -63,7 +66,5 @@ if generateButton and text:
     # Visualize NER
     html = visualize_ner(results)
     st.title('Recognize Entities')
-    st.write(html, unsafe_allow_html=True)
-
-
- 
+    # Display the output in Streamlit
+    st.markdown(html, unsafe_allow_html=True)

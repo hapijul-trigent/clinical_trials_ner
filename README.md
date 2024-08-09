@@ -33,7 +33,7 @@ clinical_trials_ner/
 ├── README.md                  # Project overview and setup instructions
 └── .gitignore                 # Git ignore file
 ```
-
+# Environment Setup
 ```
 # Installing pyspark and spark-nlp
 ! pip install --upgrade -q pyspark==3.1.2 spark-nlp==$PUBLIC_VERSION

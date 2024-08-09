@@ -15,9 +15,7 @@ from sparknlp_jsl.annotator import *
 
 import streamlit as st
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 
 @st.cache
 def setup_config(config_path='.secret/spark_nlp_for_healthcare_8568.json'):
@@ -34,6 +32,7 @@ def setup_config(config_path='.secret/spark_nlp_for_healthcare_8568.json'):
         FileNotFoundError: If the JSON file is not found.
         json.JSONDecodeError: If the JSON file cannot be decoded.
     """
+    global logger
     try:
         with open(config_path) as f:
             license_keys = json.load(f)
@@ -81,4 +80,5 @@ def initSparkSession(secret):
         raise
 
 # keys = setup_config()
-# spark = get_spark(secret=keys['SECRET'])
+# spark = initSparkSession(secret=keys['SECRET'])
+# spark.stop()

@@ -1,7 +1,20 @@
 import streamlit as st
 from data_processing import upload_file, extract_text
-from utils import model_and_entity_selection
+from ner import model_and_entity_selection
+from models.model_setup import setup_config, initSparkSession
+from models.pipeline_stages import spark, license_keys
+from models.pipeline_setup import buildNerPipeline
+from visualization import visualize_ner
 from PIL import Image
+import logging
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+
 
 # Set main panel
 favicon = Image.open("./static/images/Trigent_Logo.png")
@@ -35,4 +48,14 @@ if uploaded_file:
         generateButton = st.button('Extract Entities', type='primary')
     else:
         st.info('Empty File!')
+if generateButton and text:
+    light_model_pipeline = buildNerPipeline(selectedModel=selected_model, selectedEntities=selected_entities)
+    results = light_model_pipeline.fullAnnotate(text)
+
+    # Visualize NER
+    html = visualize_ner(results)
+    st.title('Recognize Entities')
+    st.write(html, unsafe_allow_html=True)
+
+
  

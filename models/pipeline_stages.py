@@ -1,11 +1,14 @@
 from sparknlp.base import DocumentAssembler
 from sparknlp.annotator import SentenceDetectorDLModel
 from sparknlp_jsl.annotator import Tokenizer, WordEmbeddingsModel, NerConverterInternal
+from model_setup import setup_config, initSparkSession
 
+# Init Spark
+license_keys = setup_config()
+spark = initSparkSession(secret=license_keys['SECRET'])
 
 # Converts the input text into a format that the Spark NLP pipeline can process. 
 # It creates a document column, which is the first required step in the NLP pipeline.
-
 documentAssembler = DocumentAssembler()\
                 .setInputCol("text")\
                 .setOutputCol("document")

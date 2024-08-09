@@ -65,5 +65,23 @@ To install Java 8 on Ubuntu, you can use the following steps:
    ```bash
    echo $JAVA_HOME
    ```
+** Alternative:
+```
+sudo apt install openjdk-8-jdk openjdk-8-jre
 
-These steps will install Java 8 on your Ubuntu system and configure it appropriately.
+# Add to - /etc/environment
+JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+JRE_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
+
+
+```
+6. **Set SPARK_LOCAL_IP** on Ubuntu, if get gateway error.
+```
+JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+SPARK_LOCAL_IP=10.0.3.240 / IP ADDRESS
+```
+
+7. **PySpark** on Ubuntu
+```
+https://medium.com/@GalarnykMichael/install-spark-on-ubuntu-pyspark-231c45677de0
+```

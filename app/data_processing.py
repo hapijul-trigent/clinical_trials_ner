@@ -12,7 +12,7 @@ def upload_file(location) -> Tuple:
         st.UploadedFile or None: The uploaded file object if a file is uploaded,
         otherwise None.
     """
-    uploaded_file = location.file_uploader("", type=["pdf", "docx", "txt"])
+    uploaded_file = location.file_uploader("file", type=["pdf", "docx", "txt"], label_visibility='hidden')
     return uploaded_file
 
 def extract_text(file) -> Union[str, None]:

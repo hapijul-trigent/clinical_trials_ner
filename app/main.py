@@ -8,9 +8,9 @@ sys.path.append('/workspaces/clinical_trials_ner/models')
 import streamlit as st
 from data_processing import upload_file, extract_text
 from ner import model_and_entity_selection
-from models.model_setup import setup_config, initSparkSession
-from models.pipeline_stages import spark, license_keys
-from models.pipeline_setup import buildNerPipeline
+from app.model_setup import setup_config, initSparkSession
+from app.pipeline_stages import spark, license_keys
+from app.pipeline_setup import buildNerPipeline
 from visualization import visualize_ner
 from PIL import Image
 

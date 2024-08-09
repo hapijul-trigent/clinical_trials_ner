@@ -1,5 +1,5 @@
 import pytest
-from models.model_setup import load_ner_model
+from app.model_setup import load_ner_model
 
 def test_load_ner_model():
     pipeline = load_ner_model()

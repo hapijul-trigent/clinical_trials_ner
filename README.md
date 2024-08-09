@@ -1,6 +1,7 @@
 # clinical_trials_ner
 Streamlit application that utilizes John Snow Labs NLP models to perform Named Entity Recognition on clinical trials texts
 # Navigate
+```
 clinical_trials_ner/
 │
 ├── app/
@@ -31,7 +32,7 @@ clinical_trials_ner/
 ├── requirements.txt           # Required Python packages
 ├── README.md                  # Project overview and setup instructions
 └── .gitignore                 # Git ignore file
-
+```
 
 ```
 # Installing pyspark and spark-nlp

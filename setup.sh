@@ -42,4 +42,6 @@ pip install --upgrade -q spark-nlp-jsl==$JSL_VERSION --extra-index-url https://p
 echo "Installing Spark NLP Display Library..."
 pip install -q spark-nlp-display
 
+# Installing Other Libs
+pip install -r requirements.txt
 echo "Setup complete!"

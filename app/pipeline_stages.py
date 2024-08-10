@@ -33,6 +33,6 @@ embeddings = WordEmbeddingsModel.pretrained("embeddings_clinical", "en", "clinic
 
 # Converts the NER results into a readable format (chunks of text) by combining the tokens back into the original entities.
 jsl_ner_converter = NerConverterInternal() \
-                .setInputCols(["sentence", "token", "jsl_ner"]) \
+                .setInputCols(["sentence", "token", "ner"]) \
                 .setOutputCol("ner_chunk")
 

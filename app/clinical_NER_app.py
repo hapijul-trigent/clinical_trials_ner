@@ -7,10 +7,10 @@ sys.path.append('/workspaces/clinical_trials_ner/models')
 
 import streamlit as st
 from data_processing import upload_file, extract_text
-from ner import model_and_entity_selection
-from app.model_setup import setup_config, initSparkSession
-from app.pipeline_stages import spark, license_keys
-from app.pipeline_setup import buildNerPipeline
+from ner import model_and_entity_selection, extractNamedEntities
+from model_setup import setup_config, initSparkSession
+from pipeline_stages import spark, license_keys
+from pipeline_setup import buildNerPipeline, getEntityTypes
 from visualization import visualize_ner
 from PIL import Image
 from sparknlp.annotator import *
@@ -44,27 +44,42 @@ st.set_page_config(
 # st.sidebar.image("static/images/Trigent_Logo.png")
 st.sidebar.title('Trigent Clinical NER')
 selected_model, selected_entities = model_and_entity_selection(location=st.sidebar)
+# FIle Uploader
 uploaded_file = upload_file(location=st.sidebar)
 
 # Body
 st.image('static/images/Trigent_Logo_full.png')
 st.title("Clinical Trials NER Application")
 generateButton = None
+st.sidebar.divider()
+sessionExit = st.sidebar.button(label='Stop Session', type='primary')
 if uploaded_file:
+    # Process File
     text = extract_text(uploaded_file)
     if text.strip():
         # Your text area widget
         st.text_area(label='Editor', value=text, height=200)
-        generateButton = st.button('Extract Entities', type='primary')
+        generateButton = st.button(label='Extract Entities', type='primary')
     else:
         st.info('Empty File!')
 if generateButton and text:
-    logger.info(f'{selected_model}: {selected_entities}')
-    light_model_pipeline = buildNerPipeline(selectedModel=selected_model, selectedEntities=selected_entities)
-    results = light_model_pipeline.fullAnnotate(text)
-
-    # Visualize NER
+    # build pipeline
+    extracted_entities, results = extractNamedEntities(
+        text=text, 
+        selected_model=selected_model, 
+        selected_entities=selected_entities
+    )
+    print(extracted_entities)
+    # # Visualize NER
     html = visualize_ner(results)
+    
+    # # Display the output in Streamlit
     st.title('Recognize Entities')
-    # Display the output in Streamlit
-    st.markdown(html, unsafe_allow_html=True)
+    st.markdown(
+    f'<div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap;">{html}</div>'
+    , unsafe_allow_html=True)
+
+if sessionExit:
+    spark.stop()
+    st.success('Session Terminated')
+    st.stop()

@@ -85,5 +85,5 @@ html = """<style>
 """
 
 st.markdown(
-    f'<div style="border:black;">{html}</div>'
+    f'<div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap;">{html}</div>'
     , unsafe_allow_html=True)

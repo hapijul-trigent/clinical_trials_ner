@@ -36,4 +36,3 @@ jsl_ner_converter = NerConverterInternal() \
                 .setInputCols(["sentence", "token", "jsl_ner"]) \
                 .setOutputCol("ner_chunk")
 
-

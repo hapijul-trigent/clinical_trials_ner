@@ -1,5 +1,10 @@
 import streamlit as st
 from typing import Tuple
+import logging
+from app.pipeline_setup import buildNerPipeline
+from pprint import pprint
+from pipeline_setup import getEntityTypes
+
 
 def model_and_entity_selection(location: st) -> Tuple:
     """Defines Model & Entity Selection"""
@@ -9,29 +14,41 @@ def model_and_entity_selection(location: st) -> Tuple:
         'ner_jsl_enriched',
         'ner_jsl_greedy',
     ]
-    
-    # Entitties
-    entities = [
-        "Test", "Oncological", "Procedure", "Symptom", "Treatments", "Diabetes", "Drug", "Dosage", "Date",
-        "Imagine_Finding", "Anatomical_Site", "Behavioral_Observation", "Biological_Process", "Blood_Pressure",
-        "Body_Measurement", "Cancer", "Cardiovascular_Disease", "Cell", "Chemotherapy_Regimen", "Clinical_Procedure",
-        "Cognitive_Observation", "Comorbidity", "Complication", "Condition", "Congenital_Disorder", "Dermatological",
-        "Diagnosis", "Diet", "Disability", "Disease", "Disease_Symptom", "Drug_Administration_Route", "Drug_Brand_Name",
-        "Drug_Class", "Drug_Compound", "Drug_Dosage_Form", "Drug_Indication", "Drug_Interaction", "Drug_Metabolism",
-        "Drug_Overdose", "Drug_Precaution", "Drug_Side_Effect", "Drug_Trade_Name", "Endocrine_Disorder",
-        "Environmental_Exposure", "Family_History", "Genetic_Disorder", "Genetic_Variation", "Health_Indicator",
-        "Hematological_Disorder", "Immunological_Disorder", "Infectious_Disease", "Inflammatory_Disorder",
-        "Laboratory_Finding", "Laboratory_Test", "Lipid_Disorder", "Medical_Device", "Medical_Encounter",
-        "Medical_History", "Mental_Disorder", "Metabolic_Disorder", "Microbiological_Finding", "Musculoskeletal_Disorder",
-        "Neonatal_Disorder", "Neurological_Disorder", "Nutritional_Observation", "Oncological_Procedure", "Organism",
-        "Pain", "Physical_Activity", "Physical_Exam_Finding", "Physical_Measurement", "Psychiatric_Disorder",
-        "Pulmonary_Disorder", "Renal_Disorder", "Respiratory_Disorder", "Social_History", "Substance_Abuse", "Surgical_Procedure"
-    ]
-
-    
     # Model selection
     selected_model = location.selectbox("Choose the pretrained model", options=models, index=0)
-    selected_entities = location.multiselect('Detect Clinical Entities', options=entities, default=["Treatments", "Diabetes", "Drug", "Dosage",])
-
+    
+    # Entitties
+    EntityTypes = getEntityTypes(nerModelType=selected_model)
+    selected_entities = location.multiselect('Detect Clinical Entities', options=EntityTypes, default=EntityTypes[:5])
     return selected_model, selected_entities
 
+
+def extractNamedEntities(text, selected_model, selected_entities):
+    """
+    Extract named entities from the provided text using a specified NLP model and entities.
+
+    Args:
+        text (str): The input text to extract entities from.
+        selected_model (str): The name of the model to use for entity extraction.
+        selected_entities (list): A list of entities to extract.
+
+    Returns:
+        list: A list of dictionaries containing the extracted entities and their corresponding information.
+        results: output of fullAnnote
+    """
+    logger = logging.getLogger(__name__)
+    
+    try:
+        logger.info(f'{selected_model}: {selected_entities}')
+        
+        # Build the NLP pipeline using the selected model and entities
+        light_model_pipeline = buildNerPipeline(selectedModel=selected_model, selectedEntities=selected_entities)
+        
+        # Run the pipeline on the provided text
+        results = light_model_pipeline.fullAnnotate(text)
+        logger.info(f'Extracted named entities successfully!')
+        return results[0]['ner_chunk'], results[0]
+
+    except Exception as e:
+        logger.error(f"An error occurred while extracting named entities: {str(e)}")
+        return [], None

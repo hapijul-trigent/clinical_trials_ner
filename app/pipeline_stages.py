@@ -1,7 +1,7 @@
 from sparknlp.base import DocumentAssembler
 from sparknlp.annotator import SentenceDetectorDLModel
 from sparknlp_jsl.annotator import Tokenizer, WordEmbeddingsModel, NerConverterInternal
-from model_setup import setup_config, initSparkSession
+from app.model_setup import setup_config, initSparkSession
 
 # Init Spark
 license_keys = setup_config()
@@ -33,7 +33,6 @@ embeddings = WordEmbeddingsModel.pretrained("embeddings_clinical", "en", "clinic
 
 # Converts the NER results into a readable format (chunks of text) by combining the tokens back into the original entities.
 jsl_ner_converter = NerConverterInternal() \
-                .setInputCols(["sentence", "token", "jsl_ner"]) \
+                .setInputCols(["sentence", "token", "ner"]) \
                 .setOutputCol("ner_chunk")
-
 

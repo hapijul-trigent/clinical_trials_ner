@@ -58,6 +58,40 @@ def buildNerPipeline(selectedModel, selectedEntities, spark: SparkSession = spar
         logger.error(f"Error creating NER Pipeline: {e}")
         raise
 
+@st.cache_data
+def getEntityTypes(nerModelType: str):
+    """
+    Load a specified NER model and return a list of unique entity types.
+
+    Args:
+        nerModelType (str): The path or identifier for the NER model.
+
+    Returns:
+        list: A list of unique entity types used by the model.
+
+    Raises:
+        Exception: If there is an issue loading the model or extracting the classes.
+    """
+    logger = logging.getLogger(__name__)
+    try:
+        # Load the NER model
+        logger.info(f"Loading NER model from {nerModelType}")
+        ner_model = MedicalNerModel.pretrained(nerModelType, "en", "clinical/models") \
+                .setInputCols(["sentence", "token", "embeddings"]) \
+                    .setOutputCol("jsl_ner")
+        
+        # Extract and return the unique entity types
+        entity_types = list(set([str(x)[2:] for x in ner_model.getClasses() if len(x) > 1]))
+        logger.info(f"Successfully extracted {len(entity_types)} entity types.")
+        return entity_types
+    
+    except Exception as e:
+        logger.error(f"An error occurred while loading the NER model or extracting entity types: {e}")
+        raise
+
+
+
+
 # from model_setup import setup_config, initSparkSession
 # # license_keys = setup_config()
 # # spark = initSparkSession(secret=license_keys['SECRET'])

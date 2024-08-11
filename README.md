@@ -11,12 +11,15 @@ clinical_trials_ner/
 │   ├── ner.py                 # Module for NER model integration and entity extraction
 │   ├── visualization.py       # Module for entity visualization
 │   ├── utils.py               # Utility functions
-│
-├── models/
-│   ├── __init__.py
 │   ├── model_setup.py         # Module to setup and load John Snow Labs NER models
 |   ├── pipeline_setup.py      # Module to setup pipeline stages
 |   ├── pipeline_stages.py     # Module to setup model pipeline
+|
+├── models/                    # John Snow Labs NER models
+│   ├── sentence_detector_dl_en.zip
+│   ├── 
+|   ├── 
+|   ├── 
 │
 ├── tests/
 │   ├── __init__.py

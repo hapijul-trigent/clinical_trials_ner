@@ -12,7 +12,7 @@ def upload_file(location) -> Tuple:
         st.UploadedFile or None: The uploaded file object if a file is uploaded,
         otherwise None.
     """
-    uploaded_file = location.file_uploader("file", type=["pdf", "docx", "txt"], label_visibility='hidden')
+    uploaded_file = location.file_uploader("Upload Trial File", type=["pdf", "docx", "txt"])
     return uploaded_file
 
 def extract_text(file) -> Union[str, None]:
@@ -44,3 +44,5 @@ def extract_text(file) -> Union[str, None]:
     else:
         raise ValueError(f"Unsupported file type: {file.type}")
     return text
+
+

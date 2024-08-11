@@ -4,3 +4,4 @@ python-docx
 pandas
 pytest
 pillow
+reportlab==4.2.2

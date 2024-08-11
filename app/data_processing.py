@@ -44,3 +44,5 @@ def extract_text(file) -> Union[str, None]:
     else:
         raise ValueError(f"Unsupported file type: {file.type}")
     return text
+
+

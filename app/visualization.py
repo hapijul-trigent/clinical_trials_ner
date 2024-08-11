@@ -17,7 +17,7 @@ def visualize_ner(light_result):
     try:
         visualizer = NerVisualizer()
         html = visualizer.display(light_result, label_col='ner_chunk', document_col='document', return_html=True)
-        logger.info(f"NER visualization rendered successfully: {html}")
+        logger.info(f"NER visualization rendered successfully!")
         return html
     except Exception as e:
         st.error("An error occurred while visualizing NER results.")

@@ -16,10 +16,10 @@ from PIL import Image
 from sparknlp.annotator import *
 from sparknlp_jsl.annotator import *
 from sparknlp.base import *
-
+from utils import ner_chunks_to_dataframe, dataframe_to_pdf, dataframe_to_csv
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -69,7 +69,7 @@ if generateButton and text:
         selected_model=selected_model, 
         selected_entities=selected_entities
     )
-    print(extracted_entities)
+    
     # # Visualize NER
     html = visualize_ner(results)
     
@@ -79,6 +79,23 @@ if generateButton and text:
     f'<div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap;">{html}</div>'
     , unsafe_allow_html=True)
 
+    # Convert to Downloadable Document format
+    df = ner_chunks_to_dataframe(ner_chunks=extracted_entities)
+    
+    if not df.empty:
+        st.write(df)
+        
+        # CSV download
+        csv_data = dataframe_to_csv(df)
+        if csv_data:
+            st.download_button(label="Download as CSV", data=csv_data, file_name='ner_chunks.csv', mime='text/csv')
+        
+        # PDF download
+        pdf_data = dataframe_to_pdf(df)
+        if pdf_data:
+            st.download_button(label="Download as PDF", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf')
+    else:
+        st.warning("No data available to display or download.")
 if sessionExit:
     spark.stop()
     st.success('Session Terminated')

@@ -46,19 +46,8 @@ def extractNamedEntities(text, selected_model, selected_entities):
         
         # Run the pipeline on the provided text
         results = light_model_pipeline.fullAnnotate(text)
-        
-        # Extract entities from the results
-        extracted_entities = []
-        # for result in results:
-        #     for entity in result['entities']:
-        #         extracted_entities.append({
-        #             "entity": entity.result,
-        #             "type": entity.metadata['entity'],
-        #             "start": entity.begin,
-        #             "end": entity.end
-        #         })
-        logger.info(pprint(results[0]))
-        return extracted_entities, results[0]
+        logger.info(f'Extracted named entities successfully!')
+        return results[0]['ner_chunk'], results[0]
 
     except Exception as e:
         logger.error(f"An error occurred while extracting named entities: {str(e)}")

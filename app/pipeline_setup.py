@@ -58,7 +58,7 @@ def buildNerPipeline(selectedModel, selectedEntities, spark: SparkSession = spar
         logger.error(f"Error creating NER Pipeline: {e}")
         raise
 
-
+@st.cache_data
 def getEntityTypes(nerModelType: str):
     """
     Load a specified NER model and return a list of unique entity types.

@@ -1,9 +1,9 @@
 import logging
 import sys, os
 
-sys.path.append('/workspaces/clinical_trials_ner')
-sys.path.append('/workspaces/clinical_trials_ner/app')
-sys.path.append('/workspaces/clinical_trials_ner/models')
+# sys.path.append('/workspaces/clinical_trials_ner')
+# sys.path.append('/workspaces/clinical_trials_ner/app')
+# sys.path.append('/workspaces/clinical_trials_ner/models')
 
 import streamlit as st
 from data_processing import upload_file, extract_text

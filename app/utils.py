@@ -126,3 +126,47 @@ def dataframe_to_pdf(df: pd.DataFrame) -> bytes:
         logger.error("Failed to convert DataFrame to PDF: %s", str(e))
         return b""
 
+def categorize_entities(df):
+    """
+    Categorize entities from a DataFrame into a dictionary.
+
+    Args:
+    df (pandas.DataFrame): A DataFrame containing entity information with columns:
+                           'entity', 'chunk', 'start', 'end', 'confidence', 'sentence'.
+
+    Returns:
+    dict: A dictionary where keys are entity types and values are lists of entity information.
+
+    Raises:
+    KeyError: If any required column is missing from the DataFrame.
+    Exception: For any other unexpected errors during processing.
+    """
+    logging.info("Starting entity categorization")
+    categorized = {}
+
+    try:
+        for _, row in df.iterrows():
+            entity_type = row['entity']
+            if entity_type not in categorized:
+                categorized[entity_type] = []
+            
+            entity_info = {
+                'chunk': row['chunk'],
+                'start': row['start'],
+                'end': row['end'],
+                'confidence': row['confidence'],
+                'entity': row['entity'],
+                'sentence': row['sentence']
+            }
+            categorized[entity_type].append(entity_info)
+            logging.debug(f"Processed entity: {entity_type}")
+
+        logging.info(f"Categorization complete. Found {len(categorized)} entity types.")
+        return categorized
+
+    except KeyError as e:
+        logging.error(f"Missing required column in DataFrame: {str(e)}")
+        raise
+    except Exception as e:
+        logging.error(f"Unexpected error during categorization: {str(e)}")
+        raise

@@ -16,7 +16,7 @@ from PIL import Image
 from sparknlp.annotator import *
 from sparknlp_jsl.annotator import *
 from sparknlp.base import *
-from utils import ner_chunks_to_dataframe, dataframe_to_pdf, dataframe_to_csv, dataframe_to_json
+from utils import ner_chunks_to_dataframe, dataframe_to_pdf, dataframe_to_csv, dataframe_to_json, categorize_entities
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -42,18 +42,18 @@ st.set_page_config(
 # Application
 # SideBar
 # st.sidebar.image("static/images/Trigent_Logo.png")
-st.sidebar.title('Trigent Clinical NER')
+st.image('static/images/Trigent_Logo_full.png')
+st.sidebar.markdown("""
+<h1 style="font-family: Times New Roman; color: black; text-align: left; font-size: 36px; margin-top: 20px;">
+    Clinical Trials NER 
+</h1>
+""", unsafe_allow_html=True)
 selected_model, selected_entities = model_and_entity_selection(location=st.sidebar)
 # FIle Uploader
 uploaded_file = upload_file(location=st.sidebar)
 
 # Body
-st.image('static/images/Trigent_Logo_full.png')
-st.markdown("""
-<h1 style="font-family: Times New Roman; color: black; text-align: left; font-size: 36px; margin-top: 20px;">
-    Clinical Trials NER Application
-</h1>
-""", unsafe_allow_html=True)
+
 generateButton = None
 st.sidebar.divider()
 sessionExit = st.sidebar.button(label='Stop Session', type='primary')
@@ -62,10 +62,25 @@ if uploaded_file:
     text = extract_text(uploaded_file)
     if text.strip():
         # Your text area widget
-        st.text_area(label='Editor', value=text, height=200)
+        st.markdown("""
+            <h1 style="font-family: Times New Roman; color: black; text-align: left; font-size: 36px; margin-top: 20px;">
+                Editor 
+            </h1>
+            """, unsafe_allow_html=True)
+        text = st.text_area(label='Editor', value=text, height=200, label_visibility='hidden')
         generateButton = st.button(label='Extract Entities', type='primary')
     else:
         st.info('Empty File!')
+else:
+            # Your text area widget
+    st.markdown("""
+            <h1 style="font-family: Times New Roman; color: black; text-align: left; font-size: 36px; margin-top: 20px;">
+                Editor 
+            </h1>
+            """, unsafe_allow_html=True)
+    text = st.text_area(label='Editor', value='', height=200, label_visibility='hidden', placeholder='Upload Trials data....')
+    generateButton = st.button(label='Extract Entities', type='primary', disabled=True)
+    
 if generateButton and text:
     # build pipeline
     extracted_entities, results = extractNamedEntities(
@@ -98,8 +113,9 @@ if generateButton and text:
 
     # Convert to Downloadable Document format
     df = ner_chunks_to_dataframe(ner_chunks=extracted_entities)
+    # Create Streamlit tabs dynamically
+    categorizedEntities = categorize_entities(df=df)
     if not df.empty:
-        st.write(df)
         
         # CSV download
         with csvDownloadCol:
@@ -117,8 +133,18 @@ if generateButton and text:
             pdf_data = dataframe_to_pdf(df)
             if pdf_data:
                 st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
+        
+        # Visualize Streamlit tabs dynamically
+        tabs = st.tabs([key for key in categorizedEntities.keys()])
+
+        for i, key in enumerate(categorizedEntities.keys()):
+            with tabs[i]:
+                st.header(key)
+                st.write(categorizedEntities[key]) 
     else:
         st.warning("No data available to display or download.")
+    
+
     
     
 if sessionExit:

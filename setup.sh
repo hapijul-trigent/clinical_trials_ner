@@ -20,8 +20,6 @@ sudo update-alternatives --config java
 echo "Setting JAVA_HOME environment variable..."
 JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 echo "JAVA_HOME=$JAVA_HOME" | sudo tee -a /etc/environment
-source /etc/environment
-echo "JAVA_HOME is set to $JAVA_HOME"
 
 # Step 6: Set SPARK_LOCAL_IP (if needed)
 echo "Setting SPARK_LOCAL_IP..."
@@ -29,6 +27,7 @@ SPARK_LOCAL_IP="<YOUR_IP_ADDRESS>"  # Replace with your actual IP address
 echo "SPARK_LOCAL_IP=$SPARK_LOCAL_IP" | sudo tee -a /etc/environment
 source /etc/environment
 echo "SPARK_LOCAL_IP is set to $SPARK_LOCAL_IP"
+echo "JAVA_HOME is set to $JAVA_HOME"
 
 # Step 7: Install pyspark and spark-nlp
 echo "Installing PySpark and Spark NLP..."

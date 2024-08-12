@@ -16,7 +16,7 @@ from PIL import Image
 from sparknlp.annotator import *
 from sparknlp_jsl.annotator import *
 from sparknlp.base import *
-from utils import ner_chunks_to_dataframe, dataframe_to_pdf, dataframe_to_csv
+from utils import ner_chunks_to_dataframe, dataframe_to_pdf, dataframe_to_csv, dataframe_to_json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -49,7 +49,11 @@ uploaded_file = upload_file(location=st.sidebar)
 
 # Body
 st.image('static/images/Trigent_Logo_full.png')
-st.title("Clinical Trials NER Application")
+st.markdown("""
+<h1 style="font-family: Times New Roman; color: black; text-align: left; font-size: 36px; margin-top: 20px;">
+    Clinical Trials NER Application
+</h1>
+""", unsafe_allow_html=True)
 generateButton = None
 st.sidebar.divider()
 sessionExit = st.sidebar.button(label='Stop Session', type='primary')
@@ -73,29 +77,50 @@ if generateButton and text:
     # # Visualize NER
     html = visualize_ner(results)
     
+    # Columns
+    titleCol, csvDownloadCol, jsonDownloadCol, pdfDownloadCol = st.columns([5.8, 1.4, 1.4, 1.4], vertical_alignment='bottom')
     # # Display the output in Streamlit
-    st.title('Recognize Entities')
+    with titleCol:
+        st.markdown(
+            """
+            <h1 style="font-family: Times New Roman: #27ae60; text-align: left; font-size: 32px; margin-top: 10px; background-color: #eafaf1; padding: 10px; border-radius: 5px;">
+                Recognized Entities
+            </h1>
+
+            """
+        , unsafe_allow_html=True)
     st.markdown(
-    f'<div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap;">{html}</div>'
-    , unsafe_allow_html=True)
+    f'''
+        <div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap; margin-top:10px">
+            {html}
+        </div>
+    ''',unsafe_allow_html=True)
 
     # Convert to Downloadable Document format
     df = ner_chunks_to_dataframe(ner_chunks=extracted_entities)
-    
     if not df.empty:
         st.write(df)
         
         # CSV download
-        csv_data = dataframe_to_csv(df)
-        if csv_data:
-            st.download_button(label="Download as CSV", data=csv_data, file_name='ner_chunks.csv', mime='text/csv')
+        with csvDownloadCol:
+            csv_data = dataframe_to_csv(df)
+            if csv_data:
+                st.download_button(label="CSV ⤓", data=csv_data, file_name='ner_chunks.csv', mime='text/csv', use_container_width=True)
+        # JSON download
+        with jsonDownloadCol:
+            json_data = dataframe_to_json(df)
+            if csv_data:
+                st.download_button(label="JSON ⤓", data=json_data, file_name='ner_chunks.json', mime='text/json', use_container_width=True)
         
         # PDF download
-        pdf_data = dataframe_to_pdf(df)
-        if pdf_data:
-            st.download_button(label="Download as PDF", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf')
+        with pdfDownloadCol:
+            pdf_data = dataframe_to_pdf(df)
+            if pdf_data:
+                st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
     else:
         st.warning("No data available to display or download.")
+    
+    
 if sessionExit:
     spark.stop()
     st.success('Session Terminated')

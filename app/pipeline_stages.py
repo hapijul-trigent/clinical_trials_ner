@@ -1,7 +1,7 @@
 from sparknlp.base import DocumentAssembler
 from sparknlp.annotator import SentenceDetectorDLModel
 from sparknlp_jsl.annotator import Tokenizer, WordEmbeddingsModel, NerConverterInternal
-from app.model_setup import setup_config, initSparkSession
+from model_setup import setup_config, initSparkSession
 
 # Init Spark
 license_keys = setup_config()

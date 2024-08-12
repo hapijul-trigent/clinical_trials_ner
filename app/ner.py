@@ -1,7 +1,7 @@
 import streamlit as st
 from typing import Tuple
 import logging
-from app.pipeline_setup import buildNerPipeline
+from pipeline_setup import buildNerPipeline
 from pprint import pprint
 from pipeline_setup import getEntityTypes
 

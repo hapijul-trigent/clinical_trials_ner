@@ -29,17 +29,19 @@ source /etc/environment
 echo "SPARK_LOCAL_IP is set to $SPARK_LOCAL_IP"
 echo "JAVA_HOME is set to $JAVA_HOME"
 
-# Step 7: Install pyspark and spark-nlp
+# Above Step are only for Ubuntu
+Step 7: Install pyspark and spark-nlp and required libs
+python.exe -m pip install --upgrade pip
 echo "Installing PySpark and Spark NLP..."
-pip install --upgrade -q pyspark==3.1.2 spark-nlp==$PUBLIC_VERSION
+pip install --upgrade -q pyspark==3.1.2 spark-nlp==$JSL_VERSION
 
 # Step 8: Install Spark NLP Healthcare
 echo "Installing Spark NLP Healthcare..."
-pip install --upgrade -q spark-nlp-jsl==$JSL_VERSION --extra-index-url https://pypi.johnsnowlabs.com/$SECRET
+pip install --upgrade spark-nlp-jsl==$PUBLIC_VERSION --extra-index-url https://pypi.johnsnowlabs.com/$SECRET
 
 # Step 9: Install Spark NLP Display Library for visualization
 echo "Installing Spark NLP Display Library..."
-pip install -q spark-nlp-display
+pip install spark-nlp-display
 
 # Installing Other Libs
 pip install -r requirements.txt

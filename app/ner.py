@@ -1,7 +1,7 @@
 import streamlit as st
 from typing import Tuple
 import logging
-from app.pipeline_setup import buildNerPipeline
+from pipeline_setup import buildNerPipeline
 from pprint import pprint
 from pipeline_setup import getEntityTypes
 
@@ -19,7 +19,7 @@ def model_and_entity_selection(location: st) -> Tuple:
     
     # Entitties
     EntityTypes = getEntityTypes(nerModelType=selected_model)
-    selected_entities = location.multiselect('Detect Clinical Entities', options=EntityTypes, default=EntityTypes[:5])
+    selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:5])
     return selected_model, selected_entities
 
 

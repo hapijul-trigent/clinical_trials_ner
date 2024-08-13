@@ -1,5 +1,5 @@
 import streamlit as st
-from sparknlp_display import NerVisualizer
+from ner_display import NerVisualizer
 import logging
 
 

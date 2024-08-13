@@ -19,7 +19,7 @@ def model_and_entity_selection(location: st) -> Tuple:
     
     # Entitties
     EntityTypes = getEntityTypes(nerModelType=selected_model)
-    selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:5])
+    selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:25])
     return selected_model, selected_entities
 
 

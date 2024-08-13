@@ -196,9 +196,8 @@ def create_streamlit_buttons(categoryEntities: list) -> None:
             with cols[i % 3]:  # Use the modulo operator to wrap around to the next column
                 
                 if st.button(str(button_value), key=item['entity'] + str(random.randint(1,100)), use_container_width=True):
-                    # Create an expander to show the detailed information
-                    
-                    st.markdown(f"""
+                    # Creating markdown to show the detailed information
+                    st.sidebar.markdown(f"""
                             <div style="padding: 10px; background-color: #f9f9f9; border-radius: 5px;">
                                 <p><strong>Chunk:</strong> <code>{button_value}</code></p>
                                 <p><strong>Start:</strong> <code>{item['start']}</code></p>
@@ -210,6 +209,23 @@ def create_streamlit_buttons(categoryEntities: list) -> None:
                             </div>
                             """, unsafe_allow_html=True)
 
+
     except Exception as e:
         logger.error(f"Error creating Streamlit buttons: {e}")
 
+
+def get_or_create_session_state_variable(key, default_value=None):
+    """
+    Retrieves the value of a variable from Streamlit's session state.
+    If the variable doesn't exist, it creates it with the provided default value.
+
+    Args:
+        key (str): The key of the variable in session state.
+        default_value (Any): The default value to assign if the variable doesn't exist.
+
+    Returns:
+        Any: The value of the session state variable.
+    """
+    if key not in st.session_state:
+        st.session_state[key] = default_value
+    return st.session_state[key]

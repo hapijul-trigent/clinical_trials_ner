@@ -2,7 +2,7 @@ import random
 import os
 import json
 import numpy as np
-from . import style_utils as style_config
+import style_utils as style_config
 from IPython.display import display, HTML
 
 here = os.path.abspath(os.path.dirname(__file__))

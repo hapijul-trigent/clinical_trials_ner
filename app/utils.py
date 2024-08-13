@@ -6,6 +6,8 @@ from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+import streamlit as st
+import random
 
 def ner_chunks_to_dataframe(ner_chunks: List[Annotation]) -> pd.DataFrame:
     """
@@ -170,3 +172,44 @@ def categorize_entities(df):
     except Exception as e:
         logging.error(f"Unexpected error during categorization: {str(e)}")
         raise
+
+
+def create_streamlit_buttons(categoryEntities: list) -> None:
+    """
+    Create Streamlit buttons from a list of dictionaries.
+
+    Args:
+    categoryEntities (list): A list of dictionaries containing button information.
+                 Each dictionary should have a "chunk" key with the button value.
+
+    Returns:
+    None
+    """
+    logger = logging.getLogger(__name__)
+    try:
+        # Create 3 columns (adjust this number to your liking)
+        cols = st.columns(3)
+
+        # Iterate over data and create buttons in columns
+        for i, item in enumerate(categoryEntities):
+            button_value = item["chunk"]
+            with cols[i % 3]:  # Use the modulo operator to wrap around to the next column
+                
+                if st.button(str(button_value), key=item['entity'] + str(random.randint(1,100)), use_container_width=True):
+                    # Create an expander to show the detailed information
+                    
+                    st.markdown(f"""
+                            <div style="padding: 10px; background-color: #f9f9f9; border-radius: 5px;">
+                                <p><strong>Chunk:</strong> <code>{button_value}</code></p>
+                                <p><strong>Start:</strong> <code>{item['start']}</code></p>
+                                <p><strong>End:</strong> <code>{item['end']}</code></p>
+                                <p><strong>Confidence:</strong> <code>{item['confidence']:.2f}</code></p>
+                                <p><strong>Entity:</strong> <code>{item['entity']}</code></p>
+                                <p><strong>Sentence:</strong></p>
+                                <blockquote style="margin-left: 20px;">{item['sentence']}</blockquote>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+    except Exception as e:
+        logger.error(f"Error creating Streamlit buttons: {e}")
+

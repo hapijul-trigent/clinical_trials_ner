@@ -55,10 +55,6 @@ uploaded_file = upload_file(location=st.sidebar)
 get_or_create_session_state_variable(key='uploaded_file', default_value=uploaded_file)
 get_or_create_session_state_variable(key='ner_html', default_value=None)
 
-# Spark Session
-st.sidebar.divider()
-sessionExit = st.sidebar.button(label='Stop Session', type='primary')
-
 
 # Process FIle Data
 if uploaded_file or 'trialText' in st.session_state.keys():
@@ -97,9 +93,14 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             selected_model=st.session_state['selected_model'], 
             selected_entities=st.session_state['selected_entities']
         )
-        get_or_create_session_state_variable(key='extracted_entities', default_value=extracted_entities)
+        st.session_state['extracted_entities'] = extracted_entities
         # # Visualize NER
         st.session_state['ner_html'] = visualize_ner(results)
+        
+                # Convert to Downloadable Document format
+        df = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
+        # Create Streamlit tabs dynamically
+        st.session_state['categorizedEntities'] = categorize_entities(df=df)
         
     
     # Columns
@@ -120,10 +121,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         </div>
     ''',unsafe_allow_html=True)
 
-    # Convert to Downloadable Document format
-    df = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
-    # Create Streamlit tabs dynamically
-    categorizedEntities = categorize_entities(df=df)
+    st.json(st.session_state['categorizedEntities'])
     if not df.empty:
         
         # CSV download
@@ -143,18 +141,5 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             if pdf_data:
                 st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
         
-        # Visualize Streamlit tabs dynamically
-        tabs = st.tabs([key for key in categorizedEntities.keys()])
-        for i, key in enumerate(categorizedEntities.keys()):
-            with tabs[i]:
-                st.header(key)
-                # st.write(categorizedEntities[key])
-                create_streamlit_buttons(categoryEntities=categorizedEntities[key])
     else:
         st.warning("No data available to display or download.")
-
-
-if sessionExit:
-    spark.sparkContext.stop()
-    st.success('Session Terminated')
-    st.stop()

@@ -3,7 +3,7 @@ from ner_display import NerVisualizer
 import logging
 
 
-def visualize_ner(light_result):
+def visualize_ner(light_result, selected_labels):
     """
     Visualize Named Entity Recognition (NER) results using the NerVisualizer.
 
@@ -16,7 +16,7 @@ def visualize_ner(light_result):
     logger = logging.getLogger(__name__)
     try:
         visualizer = NerVisualizer()
-        html = visualizer.display(light_result, label_col='ner_chunk', document_col='document', return_html=True)
+        html = visualizer.display(light_result, label_col='ner_chunk', document_col='document', return_html=True, labels=selected_labels)
         logger.info(f"NER visualization rendered successfully!")
         return html
     except Exception as e:

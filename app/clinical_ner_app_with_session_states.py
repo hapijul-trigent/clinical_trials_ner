@@ -1,6 +1,6 @@
 import logging
 import sys, os
-
+import pandas as pd
 import streamlit as st
 from data_processing import upload_file, extract_text
 from ner import model_and_entity_selection, extractNamedEntities
@@ -21,39 +21,40 @@ logger = logging.getLogger(__name__)
 
 
 # Set main panel
-favicon = Image.open("./static/images/Trigent_Logo.png")
+favicon = Image.open("/workspaces/clinical_trials_ner/static/images/Trigent_Logo.png")
 st.set_page_config(
-    page_title="Clinical Trials NER Application",
+    page_title="Entities in Clinical Trial | Trigent AXLR8 Labs",
     page_icon=favicon,
-    layout="centered",
-    initial_sidebar_state="expanded",
-    menu_items={
-        'Get Help': 'https://www.extremelycoolapp.com/help',
-        'Report a bug': "https://www.extremelycoolapp.com/bug",
-        'About': "Streamlit application that utilizes John Snow Labs NLP models to perform Named Entity Recognition on clinical trials texts"
-    }
+    layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
-
-# Application
-# SideBar
-# st.sidebar.image("static/images/Trigent_Logo.png")
-st.image('static/images/Trigent_Logo_full.png', use_column_width=True)
-st.sidebar.markdown(
-    """
-    <h1 style="font-family: Times New Roman; color: black; text-align: left; font-size: 36px; margin-top: 10px;">
-        Clinical Trials NER 
-    </h1>
-    """, unsafe_allow_html=True
+# Add logo and title
+logo_path = "https://trigent.com/wp-content/uploads/Trigent_Axlr8_Labs.png"
+st.markdown(
+    f"""
+    <div style="text-align: center;">
+        <img src="{logo_path}" alt="Trigent Logo" style="max-width:100%;">
+    </div>
+    """,
+    unsafe_allow_html=True
 )
+
+# Main Page Title and Caption
+st.title("Entities in Clinical Trial Abstracts")  # Placeholder for title
+# Placeholder for caption
+st.caption("This model extracts to trial design, diseases, drugs, population, statistics, publication etc. relevant entities from clinical trial abstracts.")
+
 
 # Input and Session Setup
-selected_model, selected_entities = model_and_entity_selection(location=st.sidebar)
+selected_model, selected_entities = model_and_entity_selection(location=st)
 get_or_create_session_state_variable(key='selected_model', default_value=selected_model)
 get_or_create_session_state_variable(key='selected_entities', default_value=selected_entities)
-uploaded_file = upload_file(location=st.sidebar)
+st.session_state['selected_entities'] = selected_entities
+uploaded_file = upload_file(location=st)
 get_or_create_session_state_variable(key='uploaded_file', default_value=uploaded_file)
 get_or_create_session_state_variable(key='ner_html', default_value=None)
+get_or_create_session_state_variable(key='df', default_value=pd.DataFrame())
 
 
 # Process FIle Data
@@ -95,12 +96,12 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         )
         st.session_state['extracted_entities'] = extracted_entities
         # # Visualize NER
-        st.session_state['ner_html'] = visualize_ner(results)
+        st.session_state['ner_html'] = visualize_ner(results, selected_labels=st.session_state['selected_entities'])
         
                 # Convert to Downloadable Document format
-        df = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
+        st.session_state['df'] = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
         # Create Streamlit tabs dynamically
-        st.session_state['categorizedEntities'] = categorize_entities(df=df)
+        st.session_state['categorizedEntities'] = categorize_entities(df=st.session_state['df'])
         
     
     # Columns
@@ -121,25 +122,65 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         </div>
     ''',unsafe_allow_html=True)
 
-    st.json(st.session_state['categorizedEntities'])
-    if not df.empty:
+    # st.json(st.session_state['categorizedEntities'])
+    if not st.session_state['df'].empty:
         
         # CSV download
         with csvDownloadCol:
-            csv_data = dataframe_to_csv(df)
+            csv_data = dataframe_to_csv(st.session_state['df'])
             if csv_data:
                 st.download_button(label="CSV ⤓", data=csv_data, file_name='ner_chunks.csv', mime='text/csv', use_container_width=True)
         # JSON download
         with jsonDownloadCol:
-            json_data = dataframe_to_json(df)
+            json_data = dataframe_to_json(st.session_state['df'])
             if csv_data:
                 st.download_button(label="JSON ⤓", data=json_data, file_name='ner_chunks.json', mime='text/json', use_container_width=True)
         
         # PDF download
         with pdfDownloadCol:
-            pdf_data = dataframe_to_pdf(df)
+            pdf_data = dataframe_to_pdf(st.session_state['df'])
             if pdf_data:
                 st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
-        
+        st.table(st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])]
+)
     else:
         st.warning("No data available to display or download.")
+
+
+# Footer with Font Awesome icons
+footer_html = """
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<div style="text-align: center; margin-right: 10%;">
+    <p>
+        &copy; 2024, Your Company Name. All rights reserved. |
+        <a href="https://www.linkedin.com/your-company" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a> |
+        <a href="https://www.twitter.com/your-company" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a> |
+        <a href="https://www.youtube.com/your-company" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+    </p>
+</div>
+"""
+
+# Custom CSS to make the footer sticky
+footer_css = """
+<style>
+.footer {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    color: black;
+    text-align: center;
+}
+[data-testid="stSidebarNavItems"] {
+    max-height: 100%!important;
+}
+</style>
+"""
+
+# Combining the HTML and CSS
+footer = f"{footer_css}<div class='footer'>{footer_html}</div>"
+
+# Rendering the footer
+st.markdown(footer, unsafe_allow_html=True)

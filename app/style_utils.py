@@ -46,6 +46,32 @@ STYLE_CONFIG_ENTITIES = f"""
         margin: 3px 2px;
     
     }}
+    .tooltip-container {{
+        position: relative;
+        display: inline-block;
+    }}
+    .tooltip-text {{
+        visibility: hidden;
+        width: 160px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%; /* Position the tooltip above the text */
+        left: 50%;
+        margin-left: -80px; /* Center the tooltip */
+        opacity: 0;
+        transition: opacity 0.3s;
+    }}
+
+    .tooltip-container:hover .tooltip-text {{
+        visibility: visible;
+        opacity: 1;
+    }}
+
     .spark-nlp-display-entity-type{{
         font-size: 14px;
         line-height: 24px;

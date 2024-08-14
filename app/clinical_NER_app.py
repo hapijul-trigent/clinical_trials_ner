@@ -140,7 +140,7 @@ if st.session_state['generateButton'] and st.session_state['text']:
         for i, key in enumerate(categorizedEntities.keys()):
             with tabs[i]:
                 st.header(key)
-                # st.write(categorizedEntities[key])
+                st.write(categorizedEntities)
                 create_streamlit_buttons(categoryEntities=categorizedEntities[key])
     else:
         st.warning("No data available to display or download.")

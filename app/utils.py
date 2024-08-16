@@ -7,7 +7,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import streamlit as st
-import random
+import random, json
 
 def ner_chunks_to_dataframe(ner_chunks: List[Annotation]) -> pd.DataFrame:
     """

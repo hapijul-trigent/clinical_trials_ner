@@ -1,6 +1,8 @@
 from jsl_backend.ner_display import NerVisualizer
 import logging, random
 import pandas as pd
+import json, os
+import streamlit as st
 
 def visualize_ner(light_result, selected_labels):
     """
@@ -23,7 +25,7 @@ def visualize_ner(light_result, selected_labels):
         logger.error(f"Error in visualize_ner: {e}")
 
 
-def create_multiindex_dataframe(df):
+def create_multiindex_dataframe_of_groupedEntity(df):
     """
     Create a new DataFrame with a MultiIndex based on entity groups and chunks.
 
@@ -76,6 +78,13 @@ def create_multiindex_dataframe(df):
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")
         raise
+    
+
+@st.cache_data
+def load_colors():
+    here = os.path.abspath(os.path.dirname(__file__))
+    return json.load(open(os.path.join(here, 'label_colors/ner.json'), 'r', encoding='utf-8'))
+
 
 def get_label_color(row):
         """Internal function to generate random color codes for missing colors
@@ -85,7 +94,7 @@ def get_label_color(row):
         """
         import json
         label = row['entity']
-        label_colors = json.load(open('ner.json'))
+        label_colors = load_colors()
         if str(label).lower() in label_colors:
             return ['background-color: {}'.format(label_colors[label.lower()])] * len(row) # Return a list of color values for each cell in the row
         else:
@@ -95,4 +104,3 @@ def get_label_color(row):
             return ['background-color: {}'.format(color)] * len(row) # Return a list of color values for each cell in the row
 
 
-catDf.style.apply(get_label, axis=1)

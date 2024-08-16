@@ -8,7 +8,7 @@ from jsl_backend.ner import model_and_entity_selection, extractNamedEntities
 from jsl_backend.model_setup import setup_config, initSparkSession
 from jsl_backend.pipeline_stages import spark, license_keys
 from jsl_backend.pipeline_setup import buildNerPipeline, getEntityTypes
-from jsl_backend.visualization import visualize_ner
+from jsl_backend.visualization import visualize_ner, create_multiindex_dataframe_of_groupedEntity, get_label_color
 from PIL import Image
 # from sparknlp.annotator import *
 # from sparknlp_jsl.annotator import *
@@ -103,7 +103,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
                 # Convert to Downloadable Document format
         st.session_state['df'] = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
         # Create Streamlit tabs dynamically
-        st.session_state['categorizedEntities'] = categorize_entities(df=st.session_state['df'])
+        st.session_state['categorizedEntities'] = create_multiindex_dataframe_of_groupedEntity(df=st.session_state['df'])
         
     if not st.session_state['df'].empty:
         # On Edit Entity Label Update Vizualization
@@ -127,9 +127,9 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             </div>
         ''',unsafe_allow_html=True)
 
-        # st.json(st.session_state['categorizedEntities'])
+        # st.table(st.session_state['categorizedEntities'])
 
-        filtered_df: pd.DataFrame = st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])]
+        filtered_df: pd.DataFrame = st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])].reset_index(drop=True)
         
         # Multiprocessing to speed  up download data processing
         output_queue = multiprocessing.Queue()
@@ -159,7 +159,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         with pdfDownloadCol:
             if pdf_data:
                 st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
-        st.table(filtered_df.drop(columns=['ner_source', 'sentence']))
+        st.dataframe(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1), use_container_width=True)
     else:
         st.warning("No data available to display or download.")
 

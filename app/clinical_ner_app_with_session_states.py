@@ -3,7 +3,7 @@ import sys, os
 sys.path.append('/workspaces/clinical_trials_ner')
 import pandas as pd
 import streamlit as st
-from data_processing import upload_file, extract_text
+from data_processing import upload_file, extract_text, process_dataframe
 from jsl_backend.ner import model_and_entity_selection, extractNamedEntities
 from jsl_backend.model_setup import setup_config, initSparkSession
 from jsl_backend.pipeline_stages import spark, license_keys
@@ -13,8 +13,8 @@ from PIL import Image
 # from sparknlp.annotator import *
 # from sparknlp_jsl.annotator import *
 # from sparknlp.base import *
-from utils import ner_chunks_to_dataframe, dataframe_to_pdf, dataframe_to_csv, dataframe_to_json, categorize_entities, create_streamlit_buttons, get_or_create_session_state_variable
-
+from utils import ner_chunks_to_dataframe , categorize_entities, get_or_create_session_state_variable, dataframe_to_csv, dataframe_to_json, dataframe_to_pdf
+import multiprocessing
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -128,22 +128,35 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         ''',unsafe_allow_html=True)
 
         # st.json(st.session_state['categorizedEntities'])
-    
+
         filtered_df: pd.DataFrame = st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])]
-        # CSV download
+        
+        # Multiprocessing to speed  up download data processing
+        output_queue = multiprocessing.Queue()
+    
+        # Create and start the process
+        p = multiprocessing.Process(target=process_dataframe, args=(filtered_df, output_queue))
+        p.start()
+
+        # Wait for the process to finish
+        p.join()
+        
+        # Get the results
+        results = output_queue.get()
+        csv_data = results['csv']
+        json_data = results['json']
+        pdf_data = results['pdf']
+        
         with csvDownloadCol:
-            csv_data = dataframe_to_csv(filtered_df)
             if csv_data:
                 st.download_button(label="CSV ⤓", data=csv_data, file_name='ner_chunks.csv', mime='text/csv', use_container_width=True)
         # JSON download
         with jsonDownloadCol:
-            json_data = dataframe_to_json(filtered_df)
             if csv_data:
                 st.download_button(label="JSON ⤓", data=json_data, file_name='ner_chunks.json', mime='text/json', use_container_width=True)
         
         # PDF download
         with pdfDownloadCol:
-            pdf_data = dataframe_to_pdf(filtered_df)
             if pdf_data:
                 st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
         st.table(filtered_df.drop(columns=['ner_source', 'sentence']))

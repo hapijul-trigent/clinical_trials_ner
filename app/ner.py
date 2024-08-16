@@ -3,7 +3,7 @@ from typing import Tuple
 import logging
 from pipeline_setup import buildNerPipeline
 from pprint import pprint
-from pipeline_setup import getEntityTypes
+from pipeline_setup import getEntityTypes, buildNerPipeline
 
 
 def model_and_entity_selection(location: st) -> Tuple:
@@ -20,10 +20,11 @@ def model_and_entity_selection(location: st) -> Tuple:
     # Entitties
     EntityTypes = getEntityTypes(nerModelType=selected_model)
     selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:25])
-    return selected_model, selected_entities
+    light_model_pipeline = buildNerPipeline(selectedModel=selected_model)
+    return selected_model, selected_entities, light_model_pipeline
 
 
-def extractNamedEntities(text, selected_model, selected_entities):
+def extractNamedEntities(text, selected_model, selected_entities, light_model_pipeline):
     """
     Extract named entities from the provided text using a specified NLP model and entities.
 
@@ -40,9 +41,6 @@ def extractNamedEntities(text, selected_model, selected_entities):
     
     try:
         logger.info(f'{selected_model}: {selected_entities}')
-        
-        # Build the NLP pipeline using the selected model and entities
-        light_model_pipeline = buildNerPipeline(selectedModel=selected_model, selectedEntities=selected_entities)
         
         # Run the pipeline on the provided text
         results = light_model_pipeline.fullAnnotate(text)

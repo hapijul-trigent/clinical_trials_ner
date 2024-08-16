@@ -1,17 +1,18 @@
 import logging
 import sys, os
+sys.path.append('/workspaces/clinical_trials_ner')
 import pandas as pd
 import streamlit as st
 from data_processing import upload_file, extract_text
-from ner import model_and_entity_selection, extractNamedEntities
-from model_setup import setup_config, initSparkSession
-from pipeline_stages import spark, license_keys
-from pipeline_setup import buildNerPipeline, getEntityTypes
-from visualization import visualize_ner
+from jsl_backend.ner import model_and_entity_selection, extractNamedEntities
+from jsl_backend.model_setup import setup_config, initSparkSession
+from jsl_backend.pipeline_stages import spark, license_keys
+from jsl_backend.pipeline_setup import buildNerPipeline, getEntityTypes
+from jsl_backend.visualization import visualize_ner
 from PIL import Image
-from sparknlp.annotator import *
-from sparknlp_jsl.annotator import *
-from sparknlp.base import *
+# from sparknlp.annotator import *
+# from sparknlp_jsl.annotator import *
+# from sparknlp.base import *
 from utils import ner_chunks_to_dataframe, dataframe_to_pdf, dataframe_to_csv, dataframe_to_json, categorize_entities, create_streamlit_buttons, get_or_create_session_state_variable
 
 
@@ -128,7 +129,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
 
         # st.json(st.session_state['categorizedEntities'])
     
-        filtered_df = st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])]
+        filtered_df: pd.DataFrame = st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])]
         # CSV download
         with csvDownloadCol:
             csv_data = dataframe_to_csv(filtered_df)
@@ -145,7 +146,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             pdf_data = dataframe_to_pdf(filtered_df)
             if pdf_data:
                 st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
-        st.table(st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])])
+        st.table(filtered_df.drop(columns=['ner_source', 'sentence']))
     else:
         st.warning("No data available to display or download.")
 

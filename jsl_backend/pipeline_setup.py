@@ -5,7 +5,7 @@ from sparknlp.base import LightPipeline
 from pyspark.sql import SparkSession
 import streamlit as st
 
-from pipeline_stages import (
+from jsl_backend.pipeline_stages import (
     documentAssembler,
     sentenceDetector,
     tokenizer,

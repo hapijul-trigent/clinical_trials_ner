@@ -1,9 +1,8 @@
 import streamlit as st
 from typing import Tuple
 import logging
-from pipeline_setup import buildNerPipeline
 from pprint import pprint
-from pipeline_setup import getEntityTypes, buildNerPipeline
+from jsl_backend.pipeline_setup import getEntityTypes, buildNerPipeline
 
 
 def model_and_entity_selection(location: st) -> Tuple:

@@ -1,4 +1,4 @@
-from ner_display import NerVisualizer
+from jsl_backend.ner_display import NerVisualizer
 import logging
 
 

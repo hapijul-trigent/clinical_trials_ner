@@ -4,3 +4,4 @@ tests/__pycache__
 spark-3.0.1-bin-hadoop2.7/
 spark-3.0.1-bin-hadoop2.7.tgz
 .secret/
+models/jsl_cached

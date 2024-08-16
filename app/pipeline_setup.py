@@ -16,7 +16,7 @@ from pipeline_stages import (
 
 
 @st.cache_resource(show_spinner=False)
-def buildNerPipeline(selectedModel, selectedEntities, spark: SparkSession = spark):
+def buildNerPipeline(selectedModel, spark: SparkSession = spark):
     """
     Creates a Spark NLP pipeline for Named Entity Recognition (NER) with specified entity types.
     

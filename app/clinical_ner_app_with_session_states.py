@@ -47,7 +47,7 @@ st.caption("This model extracts to trial design, diseases, drugs, population, st
 
 
 # Input and Session Setup
-selected_model, selected_entities = model_and_entity_selection(location=st)
+selected_model, selected_entities, light_model_pipeline = model_and_entity_selection(location=st)
 get_or_create_session_state_variable(key='selected_model', default_value=selected_model)
 get_or_create_session_state_variable(key='selected_entities', default_value=selected_entities)
 st.session_state['selected_entities'] = selected_entities
@@ -55,7 +55,7 @@ uploaded_file = upload_file(location=st)
 get_or_create_session_state_variable(key='uploaded_file', default_value=uploaded_file)
 get_or_create_session_state_variable(key='ner_html', default_value=None)
 get_or_create_session_state_variable(key='df', default_value=pd.DataFrame())
-
+get_or_create_session_state_variable(key='results', default_value=None)
 
 # Process FIle Data
 if uploaded_file or 'trialText' in st.session_state.keys():
@@ -89,60 +89,63 @@ else:
 if st.session_state['generateButton'] and st.session_state['trialText'] or st.session_state['ner_html'] is not None:
     # build pipeline
     if  st.session_state['generateButton'] and st.session_state['trialText']:
-        extracted_entities, results = extractNamedEntities(
+        st.session_state['extracted_entities'], st.session_state['results'] = extractNamedEntities(
             text=st.session_state['trialText'], 
             selected_model=st.session_state['selected_model'], 
-            selected_entities=st.session_state['selected_entities']
+            selected_entities=st.session_state['selected_entities'],
+            light_model_pipeline=light_model_pipeline
         )
-        st.session_state['extracted_entities'] = extracted_entities
+    
         # # Visualize NER
-        st.session_state['ner_html'] = visualize_ner(results, selected_labels=st.session_state['selected_entities'])
+        st.session_state['ner_html'] = visualize_ner(st.session_state['results'], selected_labels=st.session_state['selected_entities'])
         
                 # Convert to Downloadable Document format
         st.session_state['df'] = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
         # Create Streamlit tabs dynamically
         st.session_state['categorizedEntities'] = categorize_entities(df=st.session_state['df'])
         
-    
-    # Columns
-    titleCol, csvDownloadCol, jsonDownloadCol, pdfDownloadCol = st.columns([5.8, 1.4, 1.4, 1.4], vertical_alignment='bottom')
-    # # Display the output in Streamlit
-    with titleCol:
-        st.markdown(
-            """
-            <h1 style="font-family: Times New Roman: #27ae60; text-align: left; font-size: 32px; margin-top: 10px; background-color: #eafaf1; padding: 10px; border-radius: 5px;">
-                Clinical Entities
-            </h1>
-            """
-        , unsafe_allow_html=True)
-    st.markdown(
-    f'''
-        <div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap; margin-top:10px">
-            {st.session_state['ner_html']}
-        </div>
-    ''',unsafe_allow_html=True)
-
-    # st.json(st.session_state['categorizedEntities'])
     if not st.session_state['df'].empty:
+        # On Edit Entity Label Update Vizualization
+        st.session_state['ner_html'] = visualize_ner(st.session_state['results'], selected_labels=st.session_state['selected_entities'])
         
+        # Columns
+        titleCol, csvDownloadCol, jsonDownloadCol, pdfDownloadCol = st.columns([5.8, 1.4, 1.4, 1.4], vertical_alignment='bottom')
+        # # Display the output in Streamlit
+        with titleCol:
+            st.markdown(
+                """
+                <h1 style="font-family: Times New Roman: #27ae60; text-align: left; font-size: 32px; margin-top: 10px; background-color: #eafaf1; padding: 10px; border-radius: 5px;">
+                    Clinical Entities
+                </h1>
+                """
+            , unsafe_allow_html=True)
+        st.markdown(
+        f'''
+            <div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap; margin-top:10px">
+                {st.session_state['ner_html']}
+            </div>
+        ''',unsafe_allow_html=True)
+
+        # st.json(st.session_state['categorizedEntities'])
+    
+        filtered_df = st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])]
         # CSV download
         with csvDownloadCol:
-            csv_data = dataframe_to_csv(st.session_state['df'])
+            csv_data = dataframe_to_csv(filtered_df)
             if csv_data:
                 st.download_button(label="CSV ⤓", data=csv_data, file_name='ner_chunks.csv', mime='text/csv', use_container_width=True)
         # JSON download
         with jsonDownloadCol:
-            json_data = dataframe_to_json(st.session_state['df'])
+            json_data = dataframe_to_json(filtered_df)
             if csv_data:
                 st.download_button(label="JSON ⤓", data=json_data, file_name='ner_chunks.json', mime='text/json', use_container_width=True)
         
         # PDF download
         with pdfDownloadCol:
-            pdf_data = dataframe_to_pdf(st.session_state['df'])
+            pdf_data = dataframe_to_pdf(filtered_df)
             if pdf_data:
                 st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
-        st.table(st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])]
-)
+        st.table(st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])])
     else:
         st.warning("No data available to display or download.")
 

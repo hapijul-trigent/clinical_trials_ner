@@ -1,4 +1,3 @@
-import streamlit as st
 from ner_display import NerVisualizer
 import logging
 

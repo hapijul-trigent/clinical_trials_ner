@@ -65,9 +65,13 @@ def initSparkSession(secret):
         raise ValueError("The secret key must be provided and cannot be empty.")
 
     params = {
-        "spark.driver.memory": "4G",
-        "spark.kryoserializer.buffer.max": "2000M",
-        "spark.driver.maxResultSize": "2000M"
+        "spark.driver.memory":"15G",
+        "spark.kryoserializer.buffer.max":"2000M",
+        'spark.driver.cores':'4',
+        'spark.executor.cores':'8',
+        'spark.executor.memory':'16g',
+        "spark.jsl.settings.pretrained.cache_folder":"models/jsl_cached",
+        "spark.sql.execution.arrow.pyspark.enabled":"true"
     }
     logger = logging.getLogger(__name__)
     try:

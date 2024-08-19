@@ -14,7 +14,7 @@
     "date_time": "#a6b1e1",
     "death_entity": "#FFB5C5",
     "demographics": "#ffacb7",
-    "diabetes": "#8B668B",
+    "diabetes": "#A8F1F9",
     "diet": "#ffe6cc",
     "direction": "#CDB7B5",
     "disease_syndrome_disorder": "lightblue",
@@ -73,7 +73,7 @@
     "smoking": "#ffe6cc",
     "social_history_header": "#8B7D7B",
     "staging": "#8c61e8",
-    "strength": "#8b6673",
+    "strength": "#40e0d0",
     "substance": "#ffe6cc",
     "substance_quantity": "#ffd699",
     "symptom": "#CDB7B5",
@@ -114,6 +114,6 @@
     "size": "#746b87",
     "organism_substance": "#ffaa80",
     "gender": "#ffacb7",
-    "age": "darkorange",
+    "age": "#0E98BA",
     "date": "#a6b1e1"
 }

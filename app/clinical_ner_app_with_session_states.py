@@ -13,7 +13,7 @@ from PIL import Image
 # from sparknlp.annotator import *
 # from sparknlp_jsl.annotator import *
 # from sparknlp.base import *
-from utils import ner_chunks_to_dataframe , categorize_entities, get_or_create_session_state_variable, dataframe_to_csv, dataframe_to_json, dataframe_to_pdf
+from utils import ner_chunks_to_dataframe , categorize_entities, get_or_create_session_state_variable, dataframe_to_csv, dataframe_to_json, dataframe_to_pdf, create_streamlit_buttons
 import multiprocessing
 
 # Configure logging
@@ -65,6 +65,7 @@ st.markdown("""
     }
     span.st-ae{
         background-color:  #FCF1C9 ;
+        border: 1px black solid;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -88,13 +89,13 @@ if uploaded_file or 'trialText' in st.session_state.keys():
     
     if st.session_state['trialText'].strip():
         with modelColumn:
-            st.session_state['trialText'] = st.text_area(label='Editor', value=st.session_state['trialText'], height=240, label_visibility='hidden')
+            st.session_state['trialText'] = st.text_area(label='Editor', value=st.session_state['trialText'], height=200, label_visibility='hidden')
             st.session_state['generateButton'] = st.button(label='Extract Entities', type='primary')
     else:
         st.info('Empty File!')
 else:
     with modelColumn:
-        text = st.text_area(label='Editor', value='', height=240, label_visibility='hidden', placeholder='Upload Trials data....')
+        text = st.text_area(label='Editor', value='', height=200, label_visibility='hidden', placeholder='Upload Trials data....')
         st.session_state['generateButton'] = st.button(label='Extract Entities', type='primary', disabled=True)
 
 
@@ -114,7 +115,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         # Convert to Downloadable Document format
         st.session_state['df'] = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
         # Create Streamlit tabs dynamically
-        st.session_state['categorizedEntities'] = create_multiindex_dataframe_of_groupedEntity(df=st.session_state['df'])
+        st.session_state['categorizedEntities'] = categorize_entities(df=st.session_state['df'])
         
     if not st.session_state['df'].empty:
         with editorColumns:
@@ -127,7 +128,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             with titleCol:
                 st.markdown(
                     """
-                    <h1 style="font-family: Vistol; text-align: left; font-size: 32px; margin-top: 6px; background-color:#FCF1C9; padding: 10px; border-radius: 5px; padding-left:10px;">
+                    <h1 style="font-family: Vistol; text-align: center; font-size: 32px; margin-top: 6px; background-color:#FCF1C9; padding: 10px; border-radius: 5px; padding-left:10px;">
                         Identified Named Entities
                     </h1>
                     """
@@ -173,6 +174,15 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
                     st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
         
             st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))
+                
+            # Visualize Streamlit tabs dynamically
+            tabs = st.tabs([key for key in st.session_state['categorizedEntities'].keys()])
+
+            for i, key in enumerate(st.session_state['categorizedEntities'].keys()):
+                with tabs[i]:
+                    st.header(key)
+                    # st.write(st.session_state['categorizedEntities'][key])
+                    create_streamlit_buttons(st.session_state['categorizedEntities'][key])
     else:
         st.warning("No data available to display or download.")
 

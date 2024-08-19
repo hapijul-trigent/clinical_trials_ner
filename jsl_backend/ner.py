@@ -18,7 +18,7 @@ def model_and_entity_selection(location: st) -> Tuple:
     
     # Entitties
     EntityTypes = getEntityTypes(nerModelType=selected_model)
-    selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:25])
+    selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:25], height=20)
     light_model_pipeline = buildNerPipeline(selectedModel=selected_model)
     return selected_model, selected_entities, light_model_pipeline
 

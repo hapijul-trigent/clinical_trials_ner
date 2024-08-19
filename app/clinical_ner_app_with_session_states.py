@@ -100,7 +100,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         # # Visualize NER
         st.session_state['ner_html'] = visualize_ner(st.session_state['results'], selected_labels=st.session_state['selected_entities'])
         
-                # Convert to Downloadable Document format
+        # Convert to Downloadable Document format
         st.session_state['df'] = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
         # Create Streamlit tabs dynamically
         st.session_state['categorizedEntities'] = create_multiindex_dataframe_of_groupedEntity(df=st.session_state['df'])

@@ -48,11 +48,12 @@ st.caption("This model extracts to trial design, diseases, drugs, population,Hea
 
 
 # Input and Session Setup
-selected_model, selected_entities, light_model_pipeline = model_and_entity_selection(location=st)
+selected_model, selected_entities, light_model_pipeline, modelColumn = model_and_entity_selection(location=st)
 get_or_create_session_state_variable(key='selected_model', default_value=selected_model)
 get_or_create_session_state_variable(key='selected_entities', default_value=selected_entities)
 st.session_state['selected_entities'] = selected_entities
-uploaded_file = upload_file(location=st)
+with modelColumn:
+    uploaded_file = upload_file(location=st)
 get_or_create_session_state_variable(key='uploaded_file', default_value=uploaded_file)
 get_or_create_session_state_variable(key='ner_html', default_value=None)
 get_or_create_session_state_variable(key='df', default_value=pd.DataFrame())
@@ -170,9 +171,9 @@ footer_html = """
 <div style="text-align: center; margin-right: 10%;">
     <p>
         &copy; 2024, Trigent Software Inc. All rights reserved. |
-        <a href="https://www.linkedin.com/your-company" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a> |
-        <a href="https://www.twitter.com/your-company" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a> |
-        <a href="https://www.youtube.com/your-company" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.linkedin.com/company/trigent-software" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a> |
+        <a href="https://www.twitter.com/trigent-software" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a> |
+        <a href="https://www.youtube.com/trigent-software" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
     </p>
 </div>
 """

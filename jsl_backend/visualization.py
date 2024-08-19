@@ -101,6 +101,6 @@ def get_label_color(row):
             #update it to fetch from git new labels 
             r = lambda: random.randint(0,200)
             color = '#%02X%02X%02X' % (r(), r(), r())
-            return ['background-color: {}'.format(color)] * len(row) # Return a list of color values for each cell in the row
+            return ['background-color: {}; color: white;'.format(color)] * len(row) # Return a list of color values for each cell in the row
 
 

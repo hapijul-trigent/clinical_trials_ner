@@ -48,7 +48,27 @@ st.caption("This model extracts to trial design, diseases, drugs, population,Hea
 
 
 # Input and Session Setup
-selected_model, selected_entities, light_model_pipeline, modelColumn = model_and_entity_selection(location=st)
+# Custom CSS for styling
+st.markdown("""
+    <style>
+       /* change the select box properties */
+        div[data-baseweb="select"]>div {
+        background-color:#fff;
+        border-color:rgb(194, 189, 189);
+        width: 100%;
+    }
+
+    /* change the tag font properties */
+        span[data-baseweb="tag"]>span {
+        color: black;
+        font-size: 17px;
+    }
+    span.st-ae{
+        background-color:  #FCF1C9 ;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+selected_model, selected_entities, light_model_pipeline, modelColumn, editorColumns = model_and_entity_selection(location=st)
 get_or_create_session_state_variable(key='selected_model', default_value=selected_model)
 get_or_create_session_state_variable(key='selected_entities', default_value=selected_entities)
 st.session_state['selected_entities'] = selected_entities
@@ -67,25 +87,15 @@ if uploaded_file or 'trialText' in st.session_state.keys():
         # st.session_state['ner_html'] = None
     
     if st.session_state['trialText'].strip():
-        # Your text area widget
-        st.markdown("""
-            <h1 style="font-family: Times New Roman; color: black; text-align: left; font-size: 36px; margin-top: 20px;">
-                Editor 
-            </h1>
-            """, unsafe_allow_html=True)
-        st.session_state['trialText'] = st.text_area(label='Editor', value=st.session_state['trialText'], height=200, label_visibility='hidden')
-        st.session_state['generateButton'] = st.button(label='Extract Entities', type='primary')
+        with modelColumn:
+            st.session_state['trialText'] = st.text_area(label='Editor', value=st.session_state['trialText'], height=240, label_visibility='hidden')
+            st.session_state['generateButton'] = st.button(label='Extract Entities', type='primary')
     else:
         st.info('Empty File!')
 else:
-            # Your text area widget
-    st.markdown("""
-            <h1 style="font-family: Times New Roman; color: black; text-align: left; font-size: 36px; margin-top: 20px;">
-                Editor ✎
-            </h1>
-            """, unsafe_allow_html=True)
-    text = st.text_area(label='Editor', value='', height=200, label_visibility='hidden', placeholder='Upload Trials data....')
-    st.session_state['generateButton'] = st.button(label='Extract Entities', type='primary', disabled=True)
+    with modelColumn:
+        text = st.text_area(label='Editor', value='', height=240, label_visibility='hidden', placeholder='Upload Trials data....')
+        st.session_state['generateButton'] = st.button(label='Extract Entities', type='primary', disabled=True)
 
 
 if st.session_state['generateButton'] and st.session_state['trialText'] or st.session_state['ner_html'] is not None:
@@ -107,60 +117,62 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         st.session_state['categorizedEntities'] = create_multiindex_dataframe_of_groupedEntity(df=st.session_state['df'])
         
     if not st.session_state['df'].empty:
-        # On Edit Entity Label Update Vizualization
-        st.session_state['ner_html'] = visualize_ner(st.session_state['results'], selected_labels=st.session_state['selected_entities'])
-        
-        # Columns
-        titleCol, csvDownloadCol, jsonDownloadCol, pdfDownloadCol = st.columns([5.8, 1.4, 1.4, 1.4], vertical_alignment='bottom')
-        # # Display the output in Streamlit
-        with titleCol:
+        with editorColumns:
+            # On Edit Entity Label Update Vizualization
+            st.session_state['ner_html'] = visualize_ner(st.session_state['results'], selected_labels=st.session_state['selected_entities'])
+            
+            # Columns
+            titleCol, csvDownloadCol, jsonDownloadCol, pdfDownloadCol = st.columns([5.8, 1.4, 1.4, 1.4], vertical_alignment='bottom')
+            # # Display the output in Streamlit
+            with titleCol:
+                st.markdown(
+                    """
+                    <h1 style="font-family: Vistol; text-align: left; font-size: 32px; margin-top: 6px; background-color:#FCF1C9; padding: 10px; border-radius: 5px; padding-left:10px;">
+                        Identified Named Entities
+                    </h1>
+                    """
+                , unsafe_allow_html=True)
             st.markdown(
-                """
-                <h1 style="font-family: Times New Roman: #27ae60; text-align: left; font-size: 32px; margin-top: 10px; background-color: #eafaf1; padding: 10px; border-radius: 5px;">
-                    Clinical Entities
-                </h1>
-                """
-            , unsafe_allow_html=True)
-        st.markdown(
-        f'''
-            <div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap; margin-top:10px">
-                {st.session_state['ner_html']}
-            </div>
-        ''',unsafe_allow_html=True)
+            f'''
+                <div class="scroll entities" style="overflow-x: auto;border: 1px solid rgb(230, 233, 239);border-radius: 0.25rem;padding: 1rem;margin-bottom: 2.5rem;white-space: pre-wrap; margin-top:10px">
+                    {st.session_state['ner_html']}
+                </div>
+            ''',unsafe_allow_html=True)
 
-        # st.table(st.session_state['categorizedEntities'])
+            # st.table(st.session_state['categorizedEntities'])
 
-        filtered_df: pd.DataFrame = st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])].reset_index(drop=True).sort_values(by='entity')
+            filtered_df: pd.DataFrame = st.session_state['df'][st.session_state['df']['entity'].isin(st.session_state['selected_entities'])].reset_index(drop=True).sort_values(by='entity')
+            
+            # Multiprocessing to speed  up download data processing
+            output_queue = multiprocessing.Queue()
         
-        # Multiprocessing to speed  up download data processing
-        output_queue = multiprocessing.Queue()
-    
-        # Create and start the process
-        p = multiprocessing.Process(target=process_dataframe, args=(filtered_df, output_queue))
-        p.start()
+            # Create and start the process
+            p = multiprocessing.Process(target=process_dataframe, args=(filtered_df, output_queue))
+            p.start()
 
-        # Wait for the process to finish
-        p.join()
+            # Wait for the process to finish
+            p.join()
+            
+            # Get the results
+            results = output_queue.get()
+            csv_data = results['csv']
+            json_data = results['json']
+            pdf_data = results['pdf']
+            
+            with csvDownloadCol:
+                if csv_data:
+                    st.download_button(label="CSV ⤓", data=csv_data, file_name='ner_chunks.csv', mime='text/csv', use_container_width=True)
+            # JSON download
+            with jsonDownloadCol:
+                if csv_data:
+                    st.download_button(label="JSON ⤓", data=json_data, file_name='ner_chunks.json', mime='text/json', use_container_width=True)
+            
+            # PDF download
+            with pdfDownloadCol:
+                if pdf_data:
+                    st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
         
-        # Get the results
-        results = output_queue.get()
-        csv_data = results['csv']
-        json_data = results['json']
-        pdf_data = results['pdf']
-        
-        with csvDownloadCol:
-            if csv_data:
-                st.download_button(label="CSV ⤓", data=csv_data, file_name='ner_chunks.csv', mime='text/csv', use_container_width=True)
-        # JSON download
-        with jsonDownloadCol:
-            if csv_data:
-                st.download_button(label="JSON ⤓", data=json_data, file_name='ner_chunks.json', mime='text/json', use_container_width=True)
-        
-        # PDF download
-        with pdfDownloadCol:
-            if pdf_data:
-                st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
-        st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))
+            st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))
     else:
         st.warning("No data available to display or download.")
 

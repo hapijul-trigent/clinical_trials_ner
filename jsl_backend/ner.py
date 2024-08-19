@@ -7,30 +7,6 @@ from jsl_backend.pipeline_setup import getEntityTypes, buildNerPipeline
 
 def model_and_entity_selection(location: st) -> Tuple:
     """Defines Model & Entity Selection"""
-    # Custom CSS for styling
-    st.markdown("""
-    <style>
-        div[data-baseweb="tag"] {
-            background-color: #6b4ee6 !important;
-            color: white !important;
-            font-weight: 500;
-            border-radius: 16px;
-            padding: 4px 8px;
-            margin: 2px;
-        }
-        div[data-baseweb="tag"]:hover {
-            background-color: #5a3fd6 !important;
-        }
-        div[data-baseweb="tag"] button {
-            color: white !important;
-        }
-        .stMultiSelect [data-baseweb="select"] {
-            background-color: #f0f3ff;
-            border-radius: 8px;
-            padding: 4px;
-        }
-    </style>
-    """, unsafe_allow_html=True)
     # Models
     models = [
         'ner_jsl','ner_jsl_slim',
@@ -38,17 +14,16 @@ def model_and_entity_selection(location: st) -> Tuple:
         'ner_jsl_greedy',
     ]
     
-    modelColumn, entityLabelColumn = st.columns([3, 7])
+    modelColumn, editorColumns = st.columns([3.5, 6.5])
     with modelColumn:
         # Model selection
         selected_model = location.selectbox("Choose the pretrained model", options=models, index=0)
     
-    # Entitties
-    with entityLabelColumn:
+        # Entitties
         EntityTypes = getEntityTypes(nerModelType=selected_model)
-        selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:25], key='entity_labels')
+        selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:5], key='entity_labels')
     light_model_pipeline = buildNerPipeline(selectedModel=selected_model)
-    return selected_model, selected_entities, light_model_pipeline, modelColumn
+    return selected_model, selected_entities, light_model_pipeline, modelColumn, editorColumns
 
 
 def extractNamedEntities(text, selected_model, selected_entities, light_model_pipeline):

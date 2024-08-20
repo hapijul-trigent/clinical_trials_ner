@@ -12,12 +12,12 @@ from jsl_backend.visualization import visualize_ner, create_multiindex_dataframe
 from PIL import Image
 from utils import ner_chunks_to_dataframe , categorize_entities, get_or_create_session_state_variable, dataframe_to_csv, dataframe_to_json, dataframe_to_pdf, create_streamlit_buttons
 import multiprocessing
-from jsl_backend.entity_description_generation import loadChain
+from jsl_backend.entity_description_generation import loadChain, get_description_refrences
+from jsl_backend.entityDescCache import entities
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
 
 # Set main panel
 favicon = Image.open("/workspaces/clinical_trials_ner/static/images/Trigent_Logo.png")
@@ -79,7 +79,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # Load Groq
-# chain_description = loadChain()
+description_llm_chain = loadChain()
 
 selected_model, selected_entities, light_model_pipeline, modelColumn, editorColumns = model_and_entity_selection(location=st)
 get_or_create_session_state_variable(key='selected_model', default_value=selected_model)
@@ -91,6 +91,7 @@ get_or_create_session_state_variable(key='uploaded_file', default_value=uploaded
 get_or_create_session_state_variable(key='ner_html', default_value=None)
 get_or_create_session_state_variable(key='df', default_value=pd.DataFrame())
 get_or_create_session_state_variable(key='results', default_value=None)
+get_or_create_session_state_variable(key='entity_descriptions', default_value=None)
 
 # Process FIle Data
 if uploaded_file or 'trialText' in st.session_state.keys():
@@ -128,6 +129,10 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         st.session_state['df'] = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
         # Create Streamlit tabs dynamically
         st.session_state['categorizedEntities'] = categorize_entities(df=st.session_state['df'], chain=None)
+        
+        # Generate Description
+        filtered_entities = [(chunk, entity) for chunk, entity in st.session_state['df'][['chunk', 'entity']].itertuples(index=False, name=None) if entities.get(entity.lower(), False)]
+        st.session_state['entity_descriptions'] = get_description_refrences(entities=filtered_entities, llm_chain=description_llm_chain)
         
     if not st.session_state['df'].empty:
         with editorColumns:
@@ -184,19 +189,29 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             with pdfDownloadCol:
                 if pdf_data:
                     st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
-            st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))
+            
+            
             # Check Minimum One Entity Selection
-            if len(st.session_state['selected_entities']) > 0:
-                    
-                # Visualize Streamlit tabs dynamically
-                keysForTabs = [key for key in st.session_state['categorizedEntities'].keys() if key in st.session_state['selected_entities']]
+            # Visualize Streamlit tabs dynamically
+            keysForTabs = [key for key in st.session_state['categorizedEntities'].keys() if key in st.session_state['selected_entities']]
+            if len(keysForTabs) > 0:
+                # st.dataframe(st.session_state['entity_descriptions'], use_container_width=True)
+                # st.write(st.session_state['entity_descriptions'].set_index('EntityName').T.to_dict('list')['chest pain'])
                 tabs = st.tabs(keysForTabs)
 
                 for i, key in enumerate(keysForTabs):
                     with tabs[i]:
                         st.header(key)
-                        # st.write(st.session_state['categorizedEntities'][key])
-                        create_streamlit_buttons(st.session_state['categorizedEntities'][key], widget=editorColumns)
+                        
+                        create_streamlit_buttons(
+                            list({v['chunk']:v for v in st.session_state['categorizedEntities'][key]}.values()),    # Removes duplicate entity before sending to create buttons
+                            widget=editorColumns,   # PLace to Inject
+                            descriptions=st.session_state['entity_descriptions'].set_index('EntityName').T.to_dict('list'),     # COnverting df into processable dicts
+                        )
+            else:
+                st.info('No Entity Labels is Selected')
+        st.divider()
+        if len(st.session_state['selected_entities']) > 0: st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))  
     else:
         st.warning("No data available to display or download.")
 

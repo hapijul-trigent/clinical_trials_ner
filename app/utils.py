@@ -152,9 +152,6 @@ def categorize_entities(df, chain):
             entity_type = row['entity']
             if entity_type not in categorized:
                 categorized[entity_type] = []
-                    
-            # input_data = {"entity": row['chunk'], "type": row['entity'], 'context': 'Clinincal Trials'}
-            # description, references = get_description_refrences(input_data, llm_chain=chain)
             
             entity_info = {
                 'chunk': row['chunk'],
@@ -180,7 +177,7 @@ def categorize_entities(df, chain):
         raise
 
 
-def create_streamlit_buttons(categoryEntities: list, widget) -> None:
+def create_streamlit_buttons(categoryEntities: list, widget, descriptions) -> None:
     """
     Create Streamlit buttons from a list of dictionaries.
 
@@ -206,12 +203,15 @@ def create_streamlit_buttons(categoryEntities: list, widget) -> None:
                 if curr:
                     # Creating markdown to show the detailed information
                     with widget:
+                        content = descriptions.get(button_value, False)
+                        description = content[-2] if content else 'NA'
+                        references = content[-1].replace('<', '').replace('>', '') if content else 'NA'
                         st.markdown(f"""
                                 <div style="padding: 10px; background-color: #F5F9F4; border-radius: 5px;">
                                     <p><strong>Chunk:</strong> <code>{button_value}</code></p>
                                     <p><strong>Entity:</strong> <code>{item['entity']}</code></p>
-                                    <p><strong>Description:</strong> <code>{item['description']}</code></p>
-                                    <p><strong>References:</strong> <code>{item['references']}</code></p>
+                                    <p><strong>Description:</strong> <code>{description}</code></p>
+                                    <p><strong>References:</strong> <code>{references}</code></p>
                                 </div>
                                 """, unsafe_allow_html=True)
 

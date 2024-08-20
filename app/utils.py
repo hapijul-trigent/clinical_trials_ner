@@ -174,7 +174,7 @@ def categorize_entities(df):
         raise
 
 
-def create_streamlit_buttons(categoryEntities: list) -> None:
+def create_streamlit_buttons(categoryEntities: list, widget) -> None:
     """
     Create Streamlit buttons from a list of dictionaries.
 
@@ -193,22 +193,26 @@ def create_streamlit_buttons(categoryEntities: list) -> None:
         # Iterate over data and create buttons in columns
         for i, item in enumerate(categoryEntities):
             button_value = item["chunk"]
+            button_key = f"{item['entity']}_{i}"
             with cols[i % 3]:  # Use the modulo operator to wrap around to the next column
                 
-                if st.button(str(button_value), key=item['entity'] + str(random.randint(1,100)), use_container_width=True):
+                curr = st.button(str(button_value), key=button_key, use_container_width=True)
+                if curr:
                     # Creating markdown to show the detailed information
                     print(f'{button_value} Clicked!!!!!')
-                    st.sidebar.markdown(f"""
-                            <div style="padding: 10px; background-color: #f9f9f9; border-radius: 5px;">
-                                <p><strong>Chunk:</strong> <code>{button_value}</code></p>
-                                <p><strong>Start:</strong> <code>{item['start']}</code></p>
-                                <p><strong>End:</strong> <code>{item['end']}</code></p>
-                                <p><strong>Confidence:</strong> <code>{item['confidence']:.2f}</code></p>
-                                <p><strong>Entity:</strong> <code>{item['entity']}</code></p>
-                                <p><strong>Sentence:</strong></p>
-                                <blockquote style="margin-left: 20px;">{item['sentence']}</blockquote>
-                            </div>
-                            """, unsafe_allow_html=True)
+                    
+                    with widget:
+                        st.sidebar.markdown(f"""
+                                <div style="padding: 10px; background-color: blue; border-radius: 5px;">
+                                    <p><strong>Chunk:</strong> <code>{button_value}</code></p>
+                                    <p><strong>Start:</strong> <code>{item['start']}</code></p>
+                                    <p><strong>End:</strong> <code>{item['end']}</code></p>
+                                    <p><strong>Confidence:</strong> <code>{item['confidence']:.2f}</code></p>
+                                    <p><strong>Entity:</strong> <code>{item['entity']}</code></p>
+                                    <p><strong>Sentence:</strong></p>
+                                    <blockquote style="margin-left: 20px;">{item['sentence']}</blockquote>
+                                </div>
+                                """, unsafe_allow_html=True)
 
 
     except Exception as e:

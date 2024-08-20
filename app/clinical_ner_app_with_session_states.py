@@ -10,9 +10,6 @@ from jsl_backend.pipeline_stages import spark, license_keys
 from jsl_backend.pipeline_setup import buildNerPipeline, getEntityTypes
 from jsl_backend.visualization import visualize_ner, create_multiindex_dataframe_of_groupedEntity, get_label_color
 from PIL import Image
-# from sparknlp.annotator import *
-# from sparknlp_jsl.annotator import *
-# from sparknlp.base import *
 from utils import ner_chunks_to_dataframe , categorize_entities, get_or_create_session_state_variable, dataframe_to_csv, dataframe_to_json, dataframe_to_pdf, create_streamlit_buttons
 import multiprocessing
 
@@ -72,7 +69,6 @@ st.markdown("""
     }
     
     .st-f2 p{
-        border: 1px black solid;
         padding: 0.3rem 0.4rem;
         border-radius: 5px;
         background-color: #6699cc;
@@ -183,10 +179,9 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             with pdfDownloadCol:
                 if pdf_data:
                     st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
-        
+            st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))
             # Check Minimum One Entity Selection
             if len(st.session_state['selected_entities']) > 0:
-                st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))
                     
                 # Visualize Streamlit tabs dynamically
                 keysForTabs = [key for key in st.session_state['categorizedEntities'].keys() if key in st.session_state['selected_entities']]
@@ -196,11 +191,15 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
                     with tabs[i]:
                         st.header(key)
                         # st.write(st.session_state['categorizedEntities'][key])
-                        create_streamlit_buttons(st.session_state['categorizedEntities'][key])
+                        create_streamlit_buttons(st.session_state['categorizedEntities'][key], widget=modelColumn)
     else:
         st.warning("No data available to display or download.")
 
-
+b = ['A', 'B', 'C']
+for k in b:
+    curr = st.button(k)
+    if curr:
+        print(k)
 # Footer with Font Awesome icons
 footer_html = """
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">

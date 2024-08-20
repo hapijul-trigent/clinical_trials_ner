@@ -104,8 +104,8 @@
     "lab_result": "#3abd80",
     "negated": "#CD3700",
     "name": "#C0FF3E",
-    "lab_name": "#698B22",
-    "modifier": "#8B475D",
+    "lab_name": "#8DE88D",
+    "modifier": "#ADDFAD",
     "symptom_name": "#CDB7B5",
     "section_name": "#8B7D7B",
     "drug_name": "#a3496c",
@@ -113,7 +113,7 @@
     "grading": "#8c61e8",
     "size": "#746b87",
     "organism_substance": "#ffaa80",
-    "gender": "#ffacb7",
+    "gender": "#6ABE6B",
     "age": "#0E98BA",
     "date": "#a6b1e1"
 }

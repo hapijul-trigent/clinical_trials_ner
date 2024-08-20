@@ -65,7 +65,18 @@ st.markdown("""
     }
     span.st-ae{
         background-color:  #FCF1C9 ;
+    }
+    
+    .e1q9reml2 {
+        color: #F4FAF3;
+    }
+    
+    .st-f2 p{
         border: 1px black solid;
+        padding: 0.3rem 0.4rem;
+        border-radius: 5px;
+        background-color: #6699cc;
+        color: white;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -173,16 +184,19 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
                 if pdf_data:
                     st.download_button(label="PDF ⤓", data=pdf_data, file_name='ner_chunks.pdf', mime='application/pdf', use_container_width=True)
         
-            st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))
-                
-            # Visualize Streamlit tabs dynamically
-            tabs = st.tabs([key for key in st.session_state['categorizedEntities'].keys()])
+            # Check Minimum One Entity Selection
+            if len(st.session_state['selected_entities']) > 0:
+                st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))
+                    
+                # Visualize Streamlit tabs dynamically
+                keysForTabs = [key for key in st.session_state['categorizedEntities'].keys() if key in st.session_state['selected_entities']]
+                tabs = st.tabs(keysForTabs)
 
-            for i, key in enumerate(st.session_state['categorizedEntities'].keys()):
-                with tabs[i]:
-                    st.header(key)
-                    # st.write(st.session_state['categorizedEntities'][key])
-                    create_streamlit_buttons(st.session_state['categorizedEntities'][key])
+                for i, key in enumerate(keysForTabs):
+                    with tabs[i]:
+                        st.header(key)
+                        # st.write(st.session_state['categorizedEntities'][key])
+                        create_streamlit_buttons(st.session_state['categorizedEntities'][key])
     else:
         st.warning("No data available to display or download.")
 

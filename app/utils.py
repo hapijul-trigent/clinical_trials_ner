@@ -197,6 +197,7 @@ def create_streamlit_buttons(categoryEntities: list) -> None:
                 
                 if st.button(str(button_value), key=item['entity'] + str(random.randint(1,100)), use_container_width=True):
                     # Creating markdown to show the detailed information
+                    print(f'{button_value} Clicked!!!!!')
                     st.sidebar.markdown(f"""
                             <div style="padding: 10px; background-color: #f9f9f9; border-radius: 5px;">
                                 <p><strong>Chunk:</strong> <code>{button_value}</code></p>

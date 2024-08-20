@@ -8,6 +8,7 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import streamlit as st
 import random, json
+from jsl_backend.entity_description_generation import get_description_refrences
 
 def ner_chunks_to_dataframe(ner_chunks: List[Annotation]) -> pd.DataFrame:
     """
@@ -128,7 +129,7 @@ def dataframe_to_pdf(df: pd.DataFrame) -> bytes:
         logger.error("Failed to convert DataFrame to PDF: %s", str(e))
         return b""
 
-def categorize_entities(df):
+def categorize_entities(df, chain):
     """
     Categorize entities from a DataFrame into a dictionary.
 
@@ -151,6 +152,9 @@ def categorize_entities(df):
             entity_type = row['entity']
             if entity_type not in categorized:
                 categorized[entity_type] = []
+                    
+            # input_data = {"entity": row['chunk'], "type": row['entity'], 'context': 'Clinincal Trials'}
+            # description, references = get_description_refrences(input_data, llm_chain=chain)
             
             entity_info = {
                 'chunk': row['chunk'],
@@ -158,7 +162,9 @@ def categorize_entities(df):
                 'end': row['end'],
                 'confidence': row['confidence'],
                 'entity': row['entity'],
-                'sentence': row['sentence']
+                'sentence': row['sentence'],
+                'description': 'Clinical Entity Description',
+                'references': 'references'
             }
             categorized[entity_type].append(entity_info)
             logging.debug(f"Processed entity: {entity_type}")
@@ -199,18 +205,13 @@ def create_streamlit_buttons(categoryEntities: list, widget) -> None:
                 curr = st.button(str(button_value), key=button_key, use_container_width=True)
                 if curr:
                     # Creating markdown to show the detailed information
-                    print(f'{button_value} Clicked!!!!!')
-                    
                     with widget:
-                        st.sidebar.markdown(f"""
-                                <div style="padding: 10px; background-color: blue; border-radius: 5px;">
+                        st.markdown(f"""
+                                <div style="padding: 10px; background-color: #F5F9F4; border-radius: 5px;">
                                     <p><strong>Chunk:</strong> <code>{button_value}</code></p>
-                                    <p><strong>Start:</strong> <code>{item['start']}</code></p>
-                                    <p><strong>End:</strong> <code>{item['end']}</code></p>
-                                    <p><strong>Confidence:</strong> <code>{item['confidence']:.2f}</code></p>
                                     <p><strong>Entity:</strong> <code>{item['entity']}</code></p>
-                                    <p><strong>Sentence:</strong></p>
-                                    <blockquote style="margin-left: 20px;">{item['sentence']}</blockquote>
+                                    <p><strong>Description:</strong> <code>{item['description']}</code></p>
+                                    <p><strong>References:</strong> <code>{item['references']}</code></p>
                                 </div>
                                 """, unsafe_allow_html=True)
 

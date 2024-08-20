@@ -5,3 +5,5 @@ pandas
 pytest
 pillow
 reportlab==4.2.2
+langchain
+langchain-groq

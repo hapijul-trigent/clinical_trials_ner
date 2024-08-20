@@ -12,6 +12,7 @@ from jsl_backend.visualization import visualize_ner, create_multiindex_dataframe
 from PIL import Image
 from utils import ner_chunks_to_dataframe , categorize_entities, get_or_create_session_state_variable, dataframe_to_csv, dataframe_to_json, dataframe_to_pdf, create_streamlit_buttons
 import multiprocessing
+from jsl_backend.entity_description_generation import loadChain
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -37,7 +38,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
+st.divider()
 # Main Page Title and Caption
 st.title("Entities in Clinical Trial Abstracts")  # Placeholder for title
 # Placeholder for caption
@@ -76,6 +77,10 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
+
+# Load Groq
+# chain_description = loadChain()
+
 selected_model, selected_entities, light_model_pipeline, modelColumn, editorColumns = model_and_entity_selection(location=st)
 get_or_create_session_state_variable(key='selected_model', default_value=selected_model)
 get_or_create_session_state_variable(key='selected_entities', default_value=selected_entities)
@@ -122,7 +127,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         # Convert to Downloadable Document format
         st.session_state['df'] = ner_chunks_to_dataframe(ner_chunks=st.session_state['extracted_entities'])
         # Create Streamlit tabs dynamically
-        st.session_state['categorizedEntities'] = categorize_entities(df=st.session_state['df'])
+        st.session_state['categorizedEntities'] = categorize_entities(df=st.session_state['df'], chain=None)
         
     if not st.session_state['df'].empty:
         with editorColumns:
@@ -135,7 +140,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             with titleCol:
                 st.markdown(
                     """
-                    <h1 style="font-family: Vistol; text-align: center; font-size: 32px; margin-top: 6px; background-color:#FCF1C9; padding: 10px; border-radius: 5px; padding-left:10px;">
+                    <h1 style="font-family: Vistol; text-align: center; font-size: 32px; margin-top: 6px; background-color:#B0CFA6; padding: 10px; border-radius: 5px; padding-left:10px; color:white;">
                         Identified Named Entities
                     </h1>
                     """
@@ -191,15 +196,10 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
                     with tabs[i]:
                         st.header(key)
                         # st.write(st.session_state['categorizedEntities'][key])
-                        create_streamlit_buttons(st.session_state['categorizedEntities'][key], widget=modelColumn)
+                        create_streamlit_buttons(st.session_state['categorizedEntities'][key], widget=editorColumns)
     else:
         st.warning("No data available to display or download.")
 
-b = ['A', 'B', 'C']
-for k in b:
-    curr = st.button(k)
-    if curr:
-        print(k)
 # Footer with Font Awesome icons
 footer_html = """
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">

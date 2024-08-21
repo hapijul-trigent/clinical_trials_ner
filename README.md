@@ -19,7 +19,7 @@
 - **Streamlit Interface:** User-friendly web application built with Streamlit, allowing easy file uploads, entity selection, and results visualization.
 - **Multi-format Output:** Export extracted entities to CSV, JSON, and PDF formats.
 - **Advanced Visualization:** Visualize NER results directly in the browser with dynamic, color-coded entity displays.
-- **Clinical Entity Description and Reference grnetation:** Utilizes ChatGroq[Mixtral7b] for generation.
+- **Clinical Entity Description and Reference generation:** Utilizes ChatGroq[Mixtral7b] for generation.
 - **Session Management:** Maintains session state across different user interactions to enhance the user experience.
 
 ## Installation
@@ -108,7 +108,7 @@ We welcome contributions! If you have suggestions for improvements or have found
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## Contact
 

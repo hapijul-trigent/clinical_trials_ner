@@ -5,6 +5,7 @@ from langchain.schema import BaseOutputParser
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser, BaseOutputParser
 from io import StringIO
+import pandas as pd
 
 class CSVStringToDataFrameParser(BaseOutputParser):
     def __init__(self):

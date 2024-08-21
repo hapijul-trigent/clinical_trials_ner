@@ -204,8 +204,8 @@ def create_streamlit_buttons(categoryEntities: list, widget, descriptions) -> No
                     # Creating markdown to show the detailed information
                     with widget:
                         content = descriptions.get(button_value, False)
-                        description = content[-2] if content else 'NA'
-                        references = content[-1].replace('<', '').replace('>', '') if content else 'NA'
+                        description = content[-2] if content else 'Not a Clinical Entity'
+                        references = content[-1].replace('<', '').replace('>', '') if content else 'Not a Clinical Entity'
                         st.markdown(f"""
                                 <div style="padding: 10px; background-color: #F5F9F4; border-radius: 5px;">
                                     <p><strong>Chunk:</strong> <code>{button_value}</code></p>

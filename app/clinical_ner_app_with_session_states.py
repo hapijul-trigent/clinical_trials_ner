@@ -14,6 +14,7 @@ from utils import ner_chunks_to_dataframe , categorize_entities, get_or_create_s
 import multiprocessing
 from jsl_backend.entity_description_generation import loadChain, get_description_refrences
 from jsl_backend.entityDescCache import entities
+import pandas as pd
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -92,6 +93,7 @@ get_or_create_session_state_variable(key='ner_html', default_value=None)
 get_or_create_session_state_variable(key='df', default_value=pd.DataFrame())
 get_or_create_session_state_variable(key='results', default_value=None)
 get_or_create_session_state_variable(key='entity_descriptions', default_value=None)
+get_or_create_session_state_variable(key='generateDesciption', default_value=True)
 
 # Process FIle Data
 if uploaded_file or 'trialText' in st.session_state.keys():
@@ -132,8 +134,9 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
         
         # Generate Description
         filtered_entities = [(chunk, entity) for chunk, entity in st.session_state['df'][['chunk', 'entity']].itertuples(index=False, name=None) if entities.get(entity.lower(), False)]
-        st.session_state['entity_descriptions'] = get_description_refrences(entities=filtered_entities, llm_chain=description_llm_chain)
-        
+        # st.session_state['entity_descriptions'] = get_description_refrences(entities=filtered_entities, llm_chain=description_llm_chain)
+        st.session_state['generateDesciption'] = True
+   
     if not st.session_state['df'].empty:
         with editorColumns:
             # On Edit Entity Label Update Vizualization
@@ -194,9 +197,16 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             # Check Minimum One Entity Selection
             # Visualize Streamlit tabs dynamically
             keysForTabs = [key for key in st.session_state['categorizedEntities'].keys() if key in st.session_state['selected_entities']]
+            
+            if st.session_state['generateDesciption']:
+                filtered_entities = [(chunk, entity) for chunk, entity in st.session_state['df'][['chunk', 'entity']].itertuples(index=False, name=None) if entities.get(entity.lower(), False)]
+                st.session_state['entity_descriptions'] = get_description_refrences(entities=filtered_entities, llm_chain=description_llm_chain)
+                st.session_state['generateDesciption'] = False
+            
             if len(keysForTabs) > 0:
                 # st.dataframe(st.session_state['entity_descriptions'], use_container_width=True)
                 # st.write(st.session_state['entity_descriptions'].set_index('EntityName').T.to_dict('list')['chest pain'])
+
                 tabs = st.tabs(keysForTabs)
 
                 for i, key in enumerate(keysForTabs):

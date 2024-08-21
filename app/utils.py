@@ -207,11 +207,11 @@ def create_streamlit_buttons(categoryEntities: list, widget, descriptions) -> No
                         description = content[-2] if content else 'Not a Clinical Entity'
                         references = content[-1].replace('<', '').replace('>', '') if content else 'Not a Clinical Entity'
                         st.markdown(f"""
-                                <div style="padding: 10px; background-color: #F5F9F4; border-radius: 5px;">
-                                    <p><strong>Chunk:</strong> <code>{button_value}</code></p>
-                                    <p><strong>Entity:</strong> <code>{item['entity']}</code></p>
-                                    <p><strong>Description:</strong> <code>{description}</code></p>
-                                    <p><strong>References:</strong> <code>{references}</code></p>
+                                <div style="padding: 1rem 2rem;border-radius: 5px;background-color: #6699cc;color: white;">
+                                    <p><strong>Chunk:</strong> <code style="color:black;">{button_value}</code></p>
+                                    <p><strong>Entity:</strong> <code style="color:black;">{item['entity']}</code></p>
+                                    <p><strong>Description:</strong> <code style="color:black;">{description}</code></p>
+                                    <p><strong>References:</strong> <code style="color:black;">{references}</code></p>
                                 </div>
                                 """, unsafe_allow_html=True)
 

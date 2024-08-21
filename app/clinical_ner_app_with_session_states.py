@@ -15,6 +15,9 @@ import multiprocessing
 from jsl_backend.entity_description_generation import loadChain, get_description_refrences
 from jsl_backend.entityDescCache import entities
 import pandas as pd
+import asyncio
+import concurrent.futures
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -70,12 +73,13 @@ st.markdown("""
         color: #F4FAF3;
     }
     
-    .st-f2 p{
+    .st-fw p{
         padding: 0.3rem 0.4rem;
         border-radius: 5px;
         background-color: #6699cc;
         color: white;
     }
+ 
     </style>
     """, unsafe_allow_html=True)
 
@@ -106,6 +110,8 @@ if uploaded_file or 'trialText' in st.session_state.keys():
         with modelColumn:
             st.session_state['trialText'] = st.text_area(label='Editor', value=st.session_state['trialText'], height=200, label_visibility='hidden')
             st.session_state['generateButton'] = st.button(label='Extract Entities', type='primary')
+        if st.session_state['trialText'] is '':
+            st.session_state['ner_html'] = None
     else:
         st.info('Empty File!')
 else:
@@ -197,10 +203,12 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
             # Check Minimum One Entity Selection
             # Visualize Streamlit tabs dynamically
             keysForTabs = [key for key in st.session_state['categorizedEntities'].keys() if key in st.session_state['selected_entities']]
-            
+            st.divider()
+            if len(st.session_state['selected_entities']) > 0: st.dataframe(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1), use_container_width=True, height=300)  
             if st.session_state['generateDesciption']:
                 filtered_entities = [(chunk, entity) for chunk, entity in st.session_state['df'][['chunk', 'entity']].itertuples(index=False, name=None) if entities.get(entity.lower(), False)]
                 st.session_state['entity_descriptions'] = get_description_refrences(entities=filtered_entities, llm_chain=description_llm_chain)
+
                 st.session_state['generateDesciption'] = False
             
             if len(keysForTabs) > 0:
@@ -220,8 +228,7 @@ if st.session_state['generateButton'] and st.session_state['trialText'] or st.se
                         )
             else:
                 st.info('No Entity Labels is Selected')
-        st.divider()
-        if len(st.session_state['selected_entities']) > 0: st.table(filtered_df.drop(columns=['ner_source', 'sentence']).style.apply(get_label_color, axis=1))  
+
     else:
         st.warning("No data available to display or download.")
 

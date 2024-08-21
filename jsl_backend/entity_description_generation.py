@@ -27,13 +27,13 @@ class CSVStringToDataFrameParser(BaseOutputParser):
 @st.cache_resource(show_spinner=False)
 def loadChain() -> str:
     """
-    Generate a medical description to a given Named Entity using a pre-trained GPT model.
+    Loads Chain to Generate a medical description to a given Named Entity.
 
     Args:
-        entity (str): The medical Entity to description.
+        None
 
     Returns:
-        str: The generated description.
+        llm_chain: llm_chain to Generate
 
     Raises:
         Exception: If there's an error during pipeline execution.
@@ -60,7 +60,6 @@ def loadChain() -> str:
             max_tokens=None,
             timeout=None,
             max_retries=2,
-            groq_api_key='API'
         )
 
         # Create the LLM chain

@@ -70,7 +70,7 @@ def initSparkSession(secret):
         'spark.driver.cores':'4',
         'spark.executor.cores':'8',
         'spark.executor.memory':'16g',
-        "spark.jsl.settings.pretrained.cache_folder":"models/jsl_cached",
+        "spark.jsl.settings.pretrained.cache_folder":"jsl_backend/models/jsl_cached",
         "spark.sql.execution.arrow.pyspark.enabled":"true"
     }
     logger = logging.getLogger(__name__)

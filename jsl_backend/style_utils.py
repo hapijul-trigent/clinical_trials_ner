@@ -75,7 +75,7 @@ STYLE_CONFIG_ENTITIES = f"""
     .spark-nlp-display-entity-type{{
         font-size: 14px;
         line-height: 24px;
-        color: #ffffff;
+        color: white !important;
         font-family: 'Montserrat', sans-serif !important;
         
         text-transform: uppercase;
@@ -89,7 +89,7 @@ STYLE_CONFIG_ENTITIES = f"""
     .spark-nlp-display-entity-resolution{{
         font-size: 14px;
         line-height: 24px;
-        color: #ffffff;
+        color: white;
         font-family: 'Vistol Regular', sans-serif !important;
         
         text-transform: uppercase;

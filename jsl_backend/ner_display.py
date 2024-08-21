@@ -2,7 +2,7 @@ import random
 import os
 import json
 import numpy as np
-import style_utils as style_config
+import jsl_backend.style_utils as style_config
 from IPython.display import display, HTML
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -127,7 +127,7 @@ class NerVisualizer:
             pos = end+1
 
             if entity_type in label_color:
-                html_output += '<span class="spark-nlp-display-entity-wrapper" style="background-color: {}"><span class="spark-nlp-display-entity-name">{} </span><span class="spark-nlp-display-entity-type">{}</span></span>'.format(
+                html_output += '<span class="spark-nlp-display-entity-wrapper" style="background-color: {}"><span class="spark-nlp-display-entity-name" >{} </span><span class="spark-nlp-display-entity-type">{}</span></span>'.format(
                     label_color[entity_type],
                     original_text[begin:end+1],#entity.result,
                     entity.metadata['entity']

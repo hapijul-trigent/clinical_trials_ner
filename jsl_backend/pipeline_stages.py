@@ -1,7 +1,7 @@
 from sparknlp.base import DocumentAssembler
 from sparknlp.annotator import SentenceDetectorDLModel
 from sparknlp_jsl.annotator import Tokenizer, WordEmbeddingsModel, NerConverterInternal, MedicalTextGenerator
-from model_setup import setup_config, initSparkSession
+from jsl_backend.model_setup import setup_config, initSparkSession
 from pyspark.ml import Pipeline
 import streamlit as st
 

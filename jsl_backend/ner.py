@@ -1,9 +1,8 @@
 import streamlit as st
 from typing import Tuple
 import logging
-from pipeline_setup import buildNerPipeline
 from pprint import pprint
-from pipeline_setup import getEntityTypes, buildNerPipeline
+from jsl_backend.pipeline_setup import getEntityTypes, buildNerPipeline
 
 
 def model_and_entity_selection(location: st) -> Tuple:
@@ -14,14 +13,17 @@ def model_and_entity_selection(location: st) -> Tuple:
         'ner_jsl_enriched',
         'ner_jsl_greedy',
     ]
-    # Model selection
-    selected_model = location.selectbox("Choose the pretrained model", options=models, index=0)
     
-    # Entitties
-    EntityTypes = getEntityTypes(nerModelType=selected_model)
-    selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:25])
+    modelColumn, editorColumns = st.columns([3.5, 6.5])
+    with modelColumn:
+        # Model selection
+        selected_model = location.selectbox("Choose the pretrained model", options=models, index=0)
+    
+        # Entitties
+        EntityTypes = getEntityTypes(nerModelType=selected_model)
+        selected_entities = location.multiselect('Entity Labels', options=EntityTypes, default=EntityTypes[:5], key='entity_labels')
     light_model_pipeline = buildNerPipeline(selectedModel=selected_model)
-    return selected_model, selected_entities, light_model_pipeline
+    return selected_model, selected_entities, light_model_pipeline, modelColumn, editorColumns
 
 
 def extractNamedEntities(text, selected_model, selected_entities, light_model_pipeline):

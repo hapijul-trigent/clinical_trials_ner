@@ -39,7 +39,7 @@ def loadChain() -> str:
         Exception: If there's an error during pipeline execution.
     """
     logger = logging.getLogger(__name__)
-    logger.info("Generating medical description...")
+    logger.info("Loading llm_groq_mixtral...")
     try:
         # Define the prompt template
         prompt_template = PromptTemplate(
@@ -64,7 +64,7 @@ def loadChain() -> str:
 
         # Create the LLM chain
         llm_chain = prompt_template | llm_groq_mixtral | CSVStringToDataFrameParser()
-        logger.info("description generated successfully!")
+        logger.info("Loaded llm_groq_mixtral successfully!")
         return llm_chain
     except Exception as e:
         logger.error("Error generating medical description:", exc_info=True)
@@ -76,11 +76,10 @@ def get_description_refrences(entities, llm_chain):
     Fetches medical information for a given entity using the LLM chain.
 
     Parameters:
-        entities (dict): A dictionary containing the 'entity' and 'type'. 
-                           Example: {"entity": "Aspirin", "type": "Drug"}
+        entities : A list of tuples: Example input: [("Aspirin", "Drug"), ("Insulin", "Drug"), ("HCTZ", "Drug")]
 
     Returns:
-        json: A tuple containing 'description' (str) and 'references' (list of str).
+        df:A dataframe.
                Returns (None, None) if an error occurs.
 
     Example:

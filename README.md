@@ -1,5 +1,5 @@
 # clinical_trials_ner
-Streamlit application that utilizes John Snow Labs NLP models to perform Named Entity Recognition on clinical trials texts
+Streamlit application that utilizes John Snow Labs NLP models to perform Named Entity Recognition on clinical trials texts and ChatGroq[mixtral-8x7b-32768] for Entity description and reference generation.
 # Navigate
 ```
 clinical_trials_ner/
